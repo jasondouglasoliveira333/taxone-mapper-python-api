@@ -1,0 +1,20 @@
+insert into public.user values(1, 'WE', 'WE', current_timestamp, current_timestamp)
+
+insert into safxtable values(1, 'SAFX001', 'Produtos vendidos', null)
+
+insert into safxcolumn (id,name,"columnType",required,position,size,"safxTable_id","dsColumn_id")
+values (2, 'Name', 'VARCHAR', false, 1, 100, 1, null)
+
+insert into safxcolumn (id,name,"columnType",required,position,size,"safxTable_id","dsColumn_id")
+values (3, 'Address', 'VARCHAR', false, 1, 100, 1, null)
+
+insert into safxcolumn (id,name,"columnType",required,position,size,"safxTable_id","dsColumn_id")
+values (4, 'CPF', 'VARCHAR', false, 1, 100, 1, null)
+
+insert into safxcolumn (id,name,"columnType",required,position,size,"safxTable_id","dsColumn_id")
+values (5, 'RG', 'VARCHAR', false, 1, 100, 1, null)
+
+
+insert into dscolumn values(2, 'column_2', 'varchar', 255, 2)
+
+
