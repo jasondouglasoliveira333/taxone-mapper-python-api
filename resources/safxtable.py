@@ -13,7 +13,6 @@ def list_safxtables():
         page = request.args.get('page')
         size = request.args.get('size')
         safxtables = SAFXTable.select()
-        #print('safxtables.sql()', safxtables.sql())
         safxtablesJson = '{"content": [], "totalPages": 0}'
         if (len(safxtables) > 0):
             safxtablesJson = wrap(safxtables)
@@ -46,15 +45,11 @@ def list_safxcoluimns(id):
         page = request.args.get('page')
         size = request.args.get('size')
         safxcolumns = SAFXColumn.select().join(SAFXTable).where(SAFXTable.id==id)
-        #print('safxcolumns.sql()', safxcolumns.sql())
         safxcolumnsJson = '[]'
         if (len(safxcolumns) > 0):
             safxcolumnsJson = wraplist(safxcolumns)
         print('safxcolumnsJson:', safxcolumnsJson)
-        OURheader = Headers()
-        OURheader.add('access-control-allow-origin', '*')
         http200okresponse.set_data(safxcolumnsJson)
-        print('http200okresponse.__hash__  - list_safxcoluimns:' + str(http200okresponse.__hash__))
         return http200okresponse
     except:    
         print('sys.exception():', repr(sys.exception()))
@@ -66,12 +61,8 @@ def get_safxtable(id):
     try: 
         safxtable = SAFXTable.get(id)
         safxtablesJson = safxtable.toJson()
-        #safxtablesJson = '{"content": [], "totalPages": 0}'
-        #if (len(safxtables) > 0):
-        #    safxtablesJson = wrap(safxtables)
         print('safxtablesJson:', safxtablesJson)
         http200okresponse.set_data(safxtablesJson)
-        print('http200okresponse.__hash__  - get_safxtable:' + str(http200okresponse.__hash__))
         return http200okresponse
     except:    
         print('sys.exception():', repr(sys.exception()))
@@ -101,8 +92,8 @@ def update_safxcolumn(id):
 def update_safxtable_dstable(id, dsTableId):
     print('in update_safxtable_dstable')
     dsTable = DSTable.select().where(DSTable.id==dsTableId)
-    safxTableDic = dict(id=id)
-    safxTable = SAFXTable.update(**safxTableDic,dsTable=dsTable)
+    safxTable = SAFXTable.update(dsTable=dsTable).where(SAFXTable.id == id)
+    print('safxTable.sql():', safxTable.sql())
     safxTable.execute()
     return http200okresponse
 

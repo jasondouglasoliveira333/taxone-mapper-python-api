@@ -14,7 +14,14 @@ values (4, 'CPF', 'VARCHAR', false, 1, 100, 1, null)
 insert into safxcolumn (id,name,"columnType",required,position,size,"safxTable_id","dsColumn_id")
 values (5, 'RG', 'VARCHAR', false, 1, 100, 1, null)
 
-
 insert into dscolumn values(2, 'column_2', 'varchar', 255, 2)
+
+
+insert into schedule values(1, 'Schedule 1', 'ACTIVE', '1,3', '1,3', current_timestamp, 1)
+
+alter table SAFXTable add column schedule_id int4 constraint your_c references schedule(id)
+
+
+
 
 

@@ -5,6 +5,7 @@ from resources.upload import *
 from resources.dataSourceConfig import *
 from resources.safxtable import *
 from resources.dstable import *
+from resources.schedules import *
 
 
 class OURFlask(Flask):
@@ -43,6 +44,12 @@ app.add_url_rule('/safxTables/<id>/safxColumns', view_func=update_safxcolumn, me
 app.add_url_rule('/dsTables', view_func=list_dstables, methods= ['GET'])
 app.add_url_rule('/dsTables/<id>/dsColumns', view_func=list_dsTable_dsColumns, methods= ['GET'])
 app.add_url_rule('/safxTables/<id>/dsTables/<dsTableId>', view_func=update_safxtable_dstable, methods= ['PUT'])
+app.add_url_rule('/schedules', view_func=list_shedules, methods= ['GET'])
+app.add_url_rule('/schedules', view_func=insert_update_schedule, methods= ['POST'])
+app.add_url_rule('/schedules/<id>', view_func=delete_shedule, methods= ['DELETE'])
+app.add_url_rule('/schedules/<id>', view_func=get_schedule, methods= ['GET'])
+app.add_url_rule('/schedules/<id>/periodes', view_func=get_schedule_periods, methods= ['GET'])
+
 
 
 if __name__ == '__main__':
