@@ -52,24 +52,3 @@ def list_schedulelog_statistics():
         print('sys.exception():', repr(sys.exception()))
         return []
 
-
-def insert_update_schedulelog():
-    print('in insert_update_schedulelog')
-    schedulelogsListRaw = request.data
-    schedulelogsListBytes = io.BytesIO(schedulelogsListRaw)
-    schedulelogsList = json.load(schedulelogsListBytes)
-    schedulelogsEntity = []
-    for schedulelog in schedulelogsList:
-        if schedulelog.get('id'):
-            ScheduleLog.update(**schedulelog)
-        else:
-            ScheduleLog.create(**schedulelog)
-    return http200okresponse
-
-def delete_schedulelog(id):
-    print('in delete_schedulelog:', id)
-    q = ScheduleLog.delete().where(Email.id==id)
-    q.execute()
-    print('deleted')
-    return http200okresponse
-
