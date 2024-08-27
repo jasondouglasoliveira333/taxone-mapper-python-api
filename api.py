@@ -6,7 +6,7 @@ from resources.dataSourceConfig import *
 from resources.safxtable import *
 from resources.dstable import *
 from resources.schedules import *
-
+from resources.schedulelog import *
 
 class OURFlask(Flask):
     def make_default_options_response(self):
@@ -49,6 +49,8 @@ app.add_url_rule('/schedules', view_func=insert_update_schedule, methods= ['POST
 app.add_url_rule('/schedules/<id>', view_func=delete_shedule, methods= ['DELETE'])
 app.add_url_rule('/schedules/<id>', view_func=get_schedule, methods= ['GET'])
 app.add_url_rule('/schedules/<id>/periodes', view_func=get_schedule_periods, methods= ['GET'])
+app.add_url_rule('/schedulelogs', view_func=list_schedulelogs, methods= ['GET'])
+app.add_url_rule('/schedulelogs/statistics', view_func=list_schedulelog_statistics, methods= ['GET'])
 
 
 

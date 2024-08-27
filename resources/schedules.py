@@ -29,18 +29,20 @@ def insert_update_schedule():
     scheduleRaw = request.data
     scheduleBytes = io.BytesIO(scheduleRaw)
     schedule = json.load(scheduleBytes)
-    print ('schedule[\'safxTables\']:', schedule['safxTables'])
+        
+    print('scheduleBytes:' + str(scheduleBytes.getvalue(), encoding='utf-8'))    
     safxTables = []
     for safxTable in schedule['safxTables']:
         safxTableEntity = SAFXTable.get(safxTable.get('id'))
         safxTables.append(safxTableEntity)
-
+    
+    print ('>>>schedule[\'criterias\']:', schedule['criterias'])
     criterias = schedule['criterias'][:] #shallow copy
     del schedule['userName']
     del schedule['safxTables']
     del schedule['criterias']
     scheduleQuery = Schedule.update(**schedule).where(Schedule.id==schedule.get('id'))
-    print('scheduleQuery.sql():', scheduleQuery.sql())
+    #print('scheduleQuery.sql():', scheduleQuery.sql())
     scheduleQuery.execute()
     scheduleEntity = Schedule.get(schedule.get('id'))
     for safxTable in safxTables:
@@ -49,10 +51,9 @@ def insert_update_schedule():
 
     for criteria in criterias:
         criteriaQuery = None
-        print('>>>criteria:', criteria)
+        #print('>>>criteria:', criteria)
         safxColumnId = criteria.get('safxColumn').get('id')
-        safxColumn = SAFXColumn.get(safxColumnId)
-        print('>>safxColumn:', safxColumn)
+        safxColumn = SAFXColumn.get(SAFXColumn.id==safxColumnId)
         del criteria['safxColumn']
         if criteria.get('id'):
             criteriaQuery = Criteria.update(**criteria, schedule = scheduleEntity, safxColumn=safxColumn).where(Criteria.id == criteria.get('id'))

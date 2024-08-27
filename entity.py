@@ -92,6 +92,12 @@ class ScheduleLog(BaseModel):
     schedule = ForeignKeyField(Schedule, backref='scheduleLogs')
     #private List<ScheduleLogIntergrationError> taxOneErrors;
     
+    #scheduleName
+    def toJson(self):
+        return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '" }'
+    
+    
+    
     
 class ScheduleLogIntergrationError(BaseModel):
     numeroReg = IntegerField()
