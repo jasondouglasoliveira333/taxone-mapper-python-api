@@ -14,27 +14,27 @@ got_metadata = False
 class DataSourceConfigsController(Resource):
     logger = logging.getLogger(__name__ + '.DataSourceConfigsController')
     def get(self):
-        self.logger.info('in list_dataSourceConfigs')
+        self.logger.debug('in list_dataSourceConfigs')
         try: 
             page = request.args.get('page')
             size = request.args.get('size')
             dataSourceConfigs = DataSourceConfiguration.select()
             dataSourceConfigsJson = '{"content": [], "totalPages": 0}'
-            self.logger.info('len(dataSourceConfigs):' + str(len(dataSourceConfigs)))
+            self.logger.debug('len(dataSourceConfigs):' + str(len(dataSourceConfigs)))
             if (len(dataSourceConfigs) > 0):
                 dataSourceConfigsJson = wraplist(dataSourceConfigs)
-            self.logger.info('dataSourceConfigsJson:' + dataSourceConfigsJson)
+            self.logger.debug('dataSourceConfigsJson:' + dataSourceConfigsJson)
             http200okresponse.set_data(dataSourceConfigsJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
             
 
 class DataSourceConfigsDSTableController(Resource):
     logger = logging.getLogger(__name__ + '.DataSourceConfigsDSTableController')
     def get(self, dataSourceType):
-        self.logger.info('in list_dsTables - dataSourceType:' + dataSourceType)
+        self.logger.debug('in list_dsTables - dataSourceType:' + dataSourceType)
         try: 
             if got_metadata:
                 table = 'customer'
@@ -44,7 +44,7 @@ class DataSourceConfigsDSTableController(Resource):
                 dSTables = []
                 dSTables.append(dsTable)
                 dSTablesJson = wraplist(dSTables)
-                self.logger.info('dSTablesJson:' + dSTablesJson)
+                self.logger.debug('dSTablesJson:' + dSTablesJson)
                 http200okresponse.set_data(dSTablesJson)
                 return http200okresponse
             else:
@@ -52,14 +52,14 @@ class DataSourceConfigsDSTableController(Resource):
                 size = request.args.get('size')
                 dSTables = DSTable.select().join(DataSourceConfiguration).where(DataSourceConfiguration.dataSourceType == dataSourceType)
                 dSTablesJson = '[]'
-                self.logger.info('len(dSTables):' + str(len(dSTables)))
+                self.logger.debug('len(dSTables):' + str(len(dSTables)))
                 if (len(dSTables) > 0):
                     dSTablesJson = wraplist(dSTables)
-                self.logger.info('dSTablesJson:' + dSTablesJson)
+                self.logger.debug('dSTablesJson:' + dSTablesJson)
                 http200okresponse.set_data(dSTablesJson)
                 return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
 
@@ -71,7 +71,7 @@ class DataSourceConfigsDSColumnsController(Resource):
 class DataSourceConfigsMetadataController(Resource):
     logger = logging.getLogger(__name__ + '.DataSourceConfigsMetadataController')
     def post(self, dataSourceType):
-        self.logger.info('in get_metadata:' + dataSourceType)
+        self.logger.debug('in get_metadata:' + dataSourceType)
         try:
             dsColumnList = []
             table = 'customer'
@@ -90,21 +90,21 @@ class DataSourceConfigsMetadataController(Resource):
                 dsColumnList.append(dsC)
                 x = x + 1
             
-            self.logger.info('>>x')
+            self.logger.debug('>>x')
             dSCsJson = wrap(dsColumnList)
-            self.logger.info('dSCsJson:' + dSCsJson)
+            self.logger.debug('dSCsJson:' + dSCsJson)
             http200okresponse.set_data(dSCsJson)
             got_metadata = True
             return http200okresponse
         except:
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
 
 class DataSourceConfigsObjectController(Resource):
     logger = logging.getLogger(__name__ + '.DataSourceConfigsObjectController')
     def get(self, dataSourceType):
-        self.logger.info('in get_data_source_config - dataSourceType:' + dataSourceType)
+        self.logger.debug('in get_data_source_config - dataSourceType:' + dataSourceType)
         dataSourceConfigurations = DataSourceConfiguration.select().where(DataSourceConfiguration.dataSourceType == dataSourceType)
         dSCJson = '{}'
         if len(dataSourceConfigurations) > 0:
@@ -115,7 +115,7 @@ class DataSourceConfigsObjectController(Resource):
         return http200okresponse
         
     def post(self, dataSourceType):
-        self.logger.info('in insert_dsConfiguration - dataSourceType:' + dataSourceType)
+        self.logger.debug('in insert_dsConfiguration - dataSourceType:' + dataSourceType)
         dsConfigRaw = request.data
         dsConfigBytes = io.BytesIO(dsConfigRaw)
         dsConfig = json.load(dsConfigBytes)
@@ -135,7 +135,7 @@ class DataSourceConfigsObjectController(Resource):
         dsC.size = 255
         dsC.dsTable = dsTable
         dsC.save()
-        self.logger.info('dsC.save()')
+        self.logger.debug('dsC.save()')
         return http200okresponse
 
         

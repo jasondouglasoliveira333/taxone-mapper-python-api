@@ -10,13 +10,13 @@ from resources.rest.dstable import *
 from resources.rest.schedules import *
 from resources.rest.schedulelog import *
 
-logging.basicConfig(filename='api_taxone_flask_restfull.log', level=logging.INFO)
+logging.basicConfig(filename='api_taxone_flask_restfull.log', level=logging.DEBUG)
 
 
 class OURFlask(Flask):
     logger = logging.getLogger(__name__ + '.OURFlask')
     def make_default_options_response(self):
-        logger.info('in cors make_default_options_response')
+        logger.debug('in cors make_default_options_response')
         response = Response(
             response='',
             status=200,

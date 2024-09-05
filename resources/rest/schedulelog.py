@@ -12,7 +12,7 @@ from util import *
 class ScheduleLogListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogListController')
     def get(self):
-        self.logger.info('in list_schedulelogs:')
+        self.logger.debug('in list_schedulelogs:')
         try: 
             page = request.args.get('page')
             size = request.args.get('size')
@@ -21,17 +21,17 @@ class ScheduleLogListController(Resource):
             schedulelogsJson = '{"content": [], "totalPages": 0}'
             if (len(schedulelogs) > 0):
                 schedulelogsJson = wrap(schedulelogs)
-            self.logger.info('schedulelogsJson:' + schedulelogsJson)
+            self.logger.debug('schedulelogsJson:' + schedulelogsJson)
             http200okresponse.set_data(schedulelogsJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
 class ScheduleLogStatisticsController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogStatisticsController')
     def get(self):
-        self.logger.info('in list_schedulelogs_statistics:')
+        self.logger.debug('in list_schedulelogs_statistics:')
         try: 
             schedulelogs = ScheduleLog.select()
             PROCESSED = 0
@@ -55,6 +55,6 @@ class ScheduleLogStatisticsController(Resource):
             http200okresponse.set_data(statisticsJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 

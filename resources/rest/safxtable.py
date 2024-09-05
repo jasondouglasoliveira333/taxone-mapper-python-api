@@ -12,7 +12,7 @@ from util import *
 class SAFXTableListController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableListController')
     def get(self):
-        self.logger.info('in list_safxtables')
+        self.logger.debug('in list_safxtables')
         try: 
             page = request.args.get('page')
             size = request.args.get('size')
@@ -20,18 +20,18 @@ class SAFXTableListController(Resource):
             safxtablesJson = '{"content": [], "totalPages": 0}'
             if (len(safxtables) > 0):
                 safxtablesJson = wrap(safxtables)
-            self.logger.info('safxtablesJson:' + safxtablesJson)
+            self.logger.debug('safxtablesJson:' + safxtablesJson)
             http200okresponse.set_data(safxtablesJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
 
 class SAFXTableColumnsController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableColumnsController')
     def get(self, id):
-        self.logger.info('in list_safxcoluimns')
+        self.logger.debug('in list_safxcoluimns')
         try: 
             page = request.args.get('page')
             size = request.args.get('size')
@@ -39,19 +39,19 @@ class SAFXTableColumnsController(Resource):
             safxcolumnsJson = '[]'
             if (len(safxcolumns) > 0):
                 safxcolumnsJson = wraplist(safxcolumns)
-            self.logger.info('safxcolumnsJson:' + safxcolumnsJson)
+            self.logger.debug('safxcolumnsJson:' + safxcolumnsJson)
             http200okresponse.set_data(safxcolumnsJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
     def put(self, id):
-        self.logger.info('in update_safxcolumn - id' + str(id))
+        self.logger.debug('in update_safxcolumn - id' + str(id))
         safxcolumnsListRaw = request.data
         safxcolumnsListBytes = io.BytesIO(safxcolumnsListRaw)
         safxcolumnsList = json.load(safxcolumnsListBytes)
-        self.logger.info('safxcolumnsListBytes:' + str(safxcolumnsListBytes.getvalue(), encoding='utf-8'))
+        self.logger.debug('safxcolumnsListBytes:' + str(safxcolumnsListBytes.getvalue(), encoding='utf-8'))
         safxcolumnsEntity = []
         for safxcolumn in safxcolumnsList:
             dsColumnId = safxcolumn.get('dsColumnId')
@@ -69,22 +69,22 @@ class SAFXTableColumnsController(Resource):
 class SAFXTableObjectController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableObjectController')
     def get(self, id):
-        self.logger.info('in get_safxtable:' + str(id))
+        self.logger.debug('in get_safxtable:' + str(id))
         try: 
             safxtable = SAFXTable.get(id)
             safxtablesJson = safxtable.toJson()
-            self.logger.info('safxtablesJson:' + safxtablesJson)
+            self.logger.debug('safxtablesJson:' + safxtablesJson)
             http200okresponse.set_data(safxtablesJson)
             return http200okresponse
         except:    
-            self.logger.info('sys.exception():' + repr(sys.exception()))
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
 
 
     def put(self):
-        self.logger.info('in update_safxtable')
+        self.logger.debug('in update_safxtable')
         safxtablesListRaw = request.data
-        self.logger.info('safxtablesListRaw:' + safxtablesListRaw)
+        self.logger.debug('safxtablesListRaw:' + safxtablesListRaw)
         safxtablesListBytes = io.BytesIO(safxtablesListRaw)
         safxtablesList = json.load(safxtablesListBytes)
         safxtablesEntity = []
@@ -99,11 +99,11 @@ class SAFXTableObjectController(Resource):
 class SAFXTableDSTableController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableDSTableController')
     def put(self, id, dsTableId):
-        self.logger.info('in update_safxtable_dstable')
+        self.logger.debug('in update_safxtable_dstable')
         dsTable = DSTable.select().where(DSTable.id==dsTableId)
         safxTable = SAFXTable.update(dsTable=dsTable).where(SAFXTable.id == id)
-        self.logger.info('safxTable.sql():')
-        self.logger.info(safxTable.sql())
+        self.logger.debug('safxTable.sql():')
+        self.logger.debug(safxTable.sql())
         safxTable.execute()
         return http200okresponse
 

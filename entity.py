@@ -6,6 +6,7 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+
 class Email(BaseModel):
     email = TextField()
     type  = TextField()
@@ -13,11 +14,13 @@ class Email(BaseModel):
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"email" : "' + self.email + '",' + '"type" : "' + self.type + '" }'
 
+
 class User(BaseModel):
 	name = TextField()
 	password = TextField()
 	creationDate = DateTimeField()
 	lastAccess = DateTimeField()
+
 
 class Upload(BaseModel):
     fileName = TextField()
@@ -39,13 +42,15 @@ class DataSourceConfiguration(BaseModel):
 
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"url" : "' + self.url + '",' + '"username" : "' + self.username + '",' + '"password" : "' + self.password + '",' + '"resourceNames" : "' + self.resourceNames + '",' + '"dataSourceType" : "' + self.dataSourceType + '"}'
-    
+ 
+ 
 class DSTable(BaseModel):
     name = TextField()
     dataSourceConfiguration = ForeignKeyField(DataSourceConfiguration, backref='dsTables')
     
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '"}'
+
 
 class DSColumn(BaseModel):
     name = TextField()
@@ -55,6 +60,7 @@ class DSColumn(BaseModel):
 
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"columnType" : "' + self.columnType + '",' + '"size" : ' + str(self.size) + ',' + '"dsTable" : {"name": "' + self.dsTable.name + '" } }'
+
     
 class Schedule(BaseModel):
     name = TextField()
@@ -78,7 +84,6 @@ class Schedule(BaseModel):
             for criteria in self.criterias:      
                 criteriasJson = criteriasJson + criteria.toJson() + ','
             criteriasJson = criteriasJson[0:len(criteriasJson)-1] + ']'
-        print('>>> criteriasJson:', criteriasJson)
                   
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"status" : "' + self.status + '",' + '"userName" : "' + self.user.name + '", "safxTables": ' + safxTablesJson + ', "criterias": ' + criteriasJson + ' }'
     
@@ -92,11 +97,8 @@ class ScheduleLog(BaseModel):
     schedule = ForeignKeyField(Schedule, backref='scheduleLogs')
     #private List<ScheduleLogIntergrationError> taxOneErrors;
     
-    #scheduleName
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '" }'
-    
-    
     
     
 class ScheduleLogIntergrationError(BaseModel):
@@ -106,8 +108,6 @@ class ScheduleLogIntergrationError(BaseModel):
     nomeCampo = TextField()
     chaveRegistro = TextField()
     scheduleLog = ForeignKeyField(ScheduleLog, backref='taxOneErrors')
-    
-
 
 
 class SAFXTable(BaseModel):
@@ -123,6 +123,7 @@ class SAFXTable(BaseModel):
             dsTableId = self.dsTable.id
             dsTableName = self.dsTable.name
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"description" : "' + self.description + '",' + '"dsTableId" : "' + str(dsTableId) + '",' + '"dsTableName" : "' + dsTableName + '"}'
+
     
 class SAFXColumn(BaseModel):
     name = TextField()
