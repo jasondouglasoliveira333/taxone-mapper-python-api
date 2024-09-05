@@ -179,6 +179,7 @@ class SAFXTableSchedule(BaseModel):
 
     class Meta:
         primary_key = False
+        table_name = 'safxtable_schedule'
 
 NoteThroughDeferred.set_model(SAFXTableSchedule)
 
