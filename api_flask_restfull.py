@@ -51,7 +51,8 @@ api.add_resource(ScheduleObjectController, '/schedules', '/schedules/<id>')
 api.add_resource(SchedulePeriodsController, '/schedules/<id>/periodes')
 api.add_resource(ScheduleLogListController, '/schedulelogs')
 api.add_resource(ScheduleLogStatisticsController, '/schedulelogs/statistics')
-
+api.add_resource(ScheduleLogObjectController, '/schedulelogs/<id>')
+api.add_resource(ScheduleLogTaxOneErrorController, '/schedulelogs/<id>/taxOneErrors')
 
 
 if __name__ == '__main__':

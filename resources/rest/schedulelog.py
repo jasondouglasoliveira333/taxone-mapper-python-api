@@ -2,6 +2,7 @@ import sys
 import io
 import json
 import logging
+from datetime import datetime
 from flask import Response, request, jsonify
 from flask_restful import Resource, Api
 from werkzeug.datastructures import * #.Headers
@@ -12,7 +13,7 @@ from util import *
 class ScheduleLogListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogListController')
     def get(self):
-        self.logger.debug('in list_schedulelogs:')
+        self.logger.debug('in list_schedulelogs_list:')
         try: 
             page = request.args.get('page')
             size = request.args.get('size')
@@ -57,4 +58,39 @@ class ScheduleLogStatisticsController(Resource):
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
+
+
+class ScheduleLogObjectController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogObjectController')
+    def get(self, id):
+        self.logger.debug('in get_schedulelog:' + str(id))
+        try: 
+            scheduleLog = ScheduleLog.get(int(id))
+            scheduleLogsJson = scheduleLog.toJson()
+            self.logger.debug('scheduleLogsJson:' + scheduleLogsJson)
+            http200okresponse.set_data(scheduleLogsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+
+class ScheduleLogTaxOneErrorController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogTaxOneErrorController')
+        
+    def get(self, id):
+        self.logger.debug('in get_schedulelog_taxoneerror:' + str(id))
+        try: 
+            scheduleLog = ScheduleLog.get(int(id))
+            taxOneErrorsJson = '{"content": [], "totalPages": 0}'
+            if (len(scheduleLog.taxOneErrors) > 0):
+                taxOneErrorsJson = wrap(scheduleLog.taxOneErrors)
+            self.logger.debug('taxOneErrorsJson:' + taxOneErrorsJson)
+            http200okresponse.set_data(taxOneErrorsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+
 

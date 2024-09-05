@@ -70,7 +70,8 @@ class ScheduleObjectController(Resource):
             else:
                 criteriaQuery = Criteria.insert(**criteria, schedule = scheduleEntity, safxColumn=safxColumn)
                 criteriaQuery.execute()
-                logger.debug('criteriaQuery.sql():' + criteriaQuery.sql())
+                logger.debug('criteriaQuery.sql():')
+                logger.debug(criteriaQuery.sql())
 
         #remove old criterias
         if len(criteriasToRemove) > 0:
@@ -81,7 +82,7 @@ class ScheduleObjectController(Resource):
         return http200okresponse
 
     def delete(self, id):
-        logger.debug('in delete_shedule:', id)
+        logger.debug('in delete_shedule:' + str(id))
         q = Schedule.delete().where(Schedule.id==id)
         q.execute()
         logger.debug('deleted')

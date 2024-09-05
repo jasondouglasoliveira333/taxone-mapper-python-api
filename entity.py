@@ -72,6 +72,7 @@ class Schedule(BaseModel):
     
     def toJson(self):
         safxTablesJson = '[]'
+        criteriasJson = '[]'
         if len(self.safxTables) > 0:
             safxTablesJson = '['
             for safxTable in self.safxTables:
@@ -100,6 +101,16 @@ class ScheduleLog(BaseModel):
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '" }'
     
+    def toJsonFull(self):
+        taxOneErrorsJson = '[]'
+        if len(self.taxOneErrors) > 0:
+            taxOneErrorsJson = '['
+            for taxOneError in self.taxOneErrors:      
+                taxOneErrorsJson = taxOneErrorsJson + taxOneError.toJson() + ','
+            taxOneErrorsJson = taxOneErrorsJson[0:len(taxOneErrorsJson)-1] + ']'
+
+        return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '", "taxOneErrors" : ' + taxOneErrorsJson + '}'
+    
     
 class ScheduleLogIntergrationError(BaseModel):
     numeroReg = IntegerField()
@@ -108,6 +119,10 @@ class ScheduleLogIntergrationError(BaseModel):
     nomeCampo = TextField()
     chaveRegistro = TextField()
     scheduleLog = ForeignKeyField(ScheduleLog, backref='taxOneErrors')
+    
+    def toJson(self):
+        return '{' + '"id" : ' + str(self.id) + ',' + '"numeroReg" : "' + str(self.numeroReg) + '",' + '"codigoErro" : "' + self.codigoErro + '",' + '"descricaoErro" : "' + self.descricaoErro + '",' + '"nomeCampo" : "' + self.nomeCampo + '",' + '"chaveRegistro" : "' + self.chaveRegistro + '" }'
+    
 
 
 class SAFXTable(BaseModel):
