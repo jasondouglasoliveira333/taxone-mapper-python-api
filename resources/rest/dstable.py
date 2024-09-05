@@ -11,6 +11,7 @@ from util import *
 
 class DSTableController(Resource):
     logger = logging.getLogger(__name__ + '.DSTableController')
+    
     def get(self):
         self.logger.debug('in list_dstables')
         try: 
@@ -27,6 +28,7 @@ class DSTableController(Resource):
 
 class DSColumnController(Resource):
     logger = logging.getLogger(__name__ + '.DSColumnController')
+    
     def get(self, id):
         self.logger.debug('in list_dsTable_dsColumns')
         try: 

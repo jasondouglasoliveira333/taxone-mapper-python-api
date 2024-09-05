@@ -11,6 +11,7 @@ from util import *
 
 class SAFXTableListController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableListController')
+    
     def get(self):
         self.logger.debug('in list_safxtables')
         try: 
@@ -30,6 +31,7 @@ class SAFXTableListController(Resource):
 
 class SAFXTableColumnsController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableColumnsController')
+    
     def get(self, id):
         self.logger.debug('in list_safxcoluimns')
         try: 
@@ -68,6 +70,7 @@ class SAFXTableColumnsController(Resource):
 
 class SAFXTableObjectController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableObjectController')
+    
     def get(self, id):
         self.logger.debug('in get_safxtable:' + str(id))
         try: 
@@ -98,6 +101,7 @@ class SAFXTableObjectController(Resource):
 
 class SAFXTableDSTableController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableDSTableController')
+    
     def put(self, id, dsTableId):
         self.logger.debug('in update_safxtable_dstable')
         dsTable = DSTable.select().where(DSTable.id==dsTableId)

@@ -16,7 +16,7 @@ logging.basicConfig(filename='api_taxone_flask_restfull.log', level=logging.DEBU
 class OURFlask(Flask):
     logger = logging.getLogger(__name__ + '.OURFlask')
     def make_default_options_response(self):
-        logger.debug('in cors make_default_options_response')
+        self.logger.debug('in cors make_default_options_response')
         response = Response(
             response='',
             status=200,

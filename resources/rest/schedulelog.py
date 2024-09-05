@@ -12,6 +12,7 @@ from util import *
 
 class ScheduleLogListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogListController')
+    
     def get(self):
         self.logger.debug('in list_schedulelogs_list:')
         try: 
@@ -31,6 +32,7 @@ class ScheduleLogListController(Resource):
 
 class ScheduleLogStatisticsController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogStatisticsController')
+    
     def get(self):
         self.logger.debug('in list_schedulelogs_statistics:')
         try: 
@@ -62,6 +64,7 @@ class ScheduleLogStatisticsController(Resource):
 
 class ScheduleLogObjectController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogObjectController')
+    
     def get(self, id):
         self.logger.debug('in get_schedulelog:' + str(id))
         try: 

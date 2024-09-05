@@ -11,6 +11,7 @@ from util import *
 
 class EmailController(Resource):
     logger = logging.getLogger(__name__ + '.EmailController')
+    
     def get(self):
         self.logger.debug('in list_emails')
         try: 
@@ -45,6 +46,7 @@ class EmailController(Resource):
 
 class EmailByIdController(Resource):
     logger = logging.getLogger(__name__ + '.EmailByIdController')
+    
     def get(self, id):
         self.logger.debug('in list_emails with id:' + str(id))
         return http200okresponse
