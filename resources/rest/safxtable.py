@@ -15,12 +15,14 @@ class SAFXTableListController(Resource):
     def get(self):
         self.logger.debug('in list_safxtables')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
-            safxtables = SAFXTable.select()
+            page = int(request.args.get('page'))
+            size = int(request.args.get('size'))
+            safxtables = SAFXTable.select().paginate(page+1, size)
             safxtablesJson = '{"content": [], "totalPages": 0}'
             if (len(safxtables) > 0):
-                safxtablesJson = wrap(safxtables)
+                count = len(SAFXTable.select())
+                totalPages = int(count / size) + 1 if count % size != 0 else 0
+                safxtablesJson = wrap(safxtables, totalPages)
             self.logger.debug('safxtablesJson:' + safxtablesJson)
             http200okresponse.set_data(safxtablesJson)
             return http200okresponse
@@ -35,8 +37,6 @@ class SAFXTableColumnsController(Resource):
     def get(self, id):
         self.logger.debug('in list_safxcoluimns')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
             safxcolumns = SAFXColumn.select().join(SAFXTable).where(SAFXTable.id==id)
             safxcolumnsJson = '[]'
             if (len(safxcolumns) > 0):

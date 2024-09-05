@@ -30,5 +30,9 @@ insert into schedulelog values(4, '4', current_timestamp, '', 'ERROR_TAXONE', ''
 insert into schedulelogintergrationerror (id,"numeroReg","codigoErro","descricaoErro","nomeCampo","chaveRegistro","scheduleLog_id")
 values (1, 1, '20', 'Tamanho maior que 50 caracteres', 'CPF', '2', 4) 
 
+insert into schedulelogintergrationerror (id,"numeroReg","codigoErro","descricaoErro","nomeCampo","chaveRegistro","scheduleLog_id")
+values (2, 1, '30', 'Tamanho maior que 40 caracteres', 'RG', '2', 4) 
+
+
 
 

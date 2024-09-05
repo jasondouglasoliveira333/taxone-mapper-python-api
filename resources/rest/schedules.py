@@ -15,11 +15,13 @@ class ScheduleListController(Resource):
     def get(self):
         self.logger.debug('in list_shedules')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
-            shedules = Schedule.select()
+            page = int(request.args.get('page'))
+            size = int(request.args.get('size'))
+            shedules = Schedule.select().paginate(page+1, size)
             shedulesJson = '{"content": [], "totalPages": 0}'
             if (len(shedules) > 0):
+                count = len(Schedule.select())
+                totalPages = int(count / size) + 1 if count % size != 0 else 0
                 shedulesJson = wrap(shedules)
             self.logger.debug('shedulesJson:' + shedulesJson)
             http200okresponse.set_data(shedulesJson)
@@ -103,6 +105,7 @@ class ScheduleObjectController(Resource):
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
+
 
 class SchedulePeriodsController(Resource):
     logger = logging.getLogger(__name__ + '.SchedulePeriodsController')

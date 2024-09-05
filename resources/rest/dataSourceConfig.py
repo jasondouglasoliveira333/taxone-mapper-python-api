@@ -17,10 +17,8 @@ class DataSourceConfigsController(Resource):
     def get(self):
         self.logger.debug('in list_dataSourceConfigs')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
             dataSourceConfigs = DataSourceConfiguration.select()
-            dataSourceConfigsJson = '{"content": [], "totalPages": 0}'
+            dataSourceConfigsJson = '[]'
             self.logger.debug('len(dataSourceConfigs):' + str(len(dataSourceConfigs)))
             if (len(dataSourceConfigs) > 0):
                 dataSourceConfigsJson = wraplist(dataSourceConfigs)

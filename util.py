@@ -20,7 +20,7 @@ def wraplist(values):
     vsJson = vsJson[0:len(vsJson)-1] + ']'
     return vsJson
 
-def wrap(values):
+def wrap(values, totalPages=1):
     vsJson = wraplist(values)
-    wrapper = '{"content": ' + vsJson + ', "totalPages": 1}'
+    wrapper = '{"content": ' + vsJson + ', "totalPages": ' + str(totalPages)+ '}'
     return wrapper

@@ -14,13 +14,15 @@ class UploadController(Resource):
     def get(self):
         self.logger.debug('in list_uploads')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
-            uploads = Upload.select()
+            page = int(request.args.get('page'))
+            size = int(request.args.get('size'))
+            uploads = Upload.select().paginate(page+1, size)
             uploadsJson = '{"content": [], "totalPages": 0}'
             self.logger.debug('len(uploads):' + str(len(uploads)))
             if (len(uploads) > 0):
-                uploadsJson = wrap(uploads)
+                count = len(Upload.select())
+                totalPages = int(count / size) + 1 if count % size != 0 else 0
+                uploadsJson = wrap(uploads, totalPages)
             self.logger.debug('uploadsJson:' + uploadsJson)
             http200okresponse.set_data(uploadsJson)
             return http200okresponse
@@ -33,7 +35,6 @@ class UploadController(Resource):
             self.logger.debug('in insert_upload')
             self.logger.debug(request.files)
             files = request.files['file']
-            #self.logger.debug('files', dir(files))
             layoutVersion = request.form.get('layoutVersion')
             users = User.select().where(User.id == 1)
             self.logger.debug('len(users):' + str(len(users)))

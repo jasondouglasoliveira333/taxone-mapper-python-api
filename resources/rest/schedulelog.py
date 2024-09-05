@@ -14,15 +14,17 @@ class ScheduleLogListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogListController')
     
     def get(self):
-        self.logger.debug('in list_schedulelogs_list:')
+        self.logger.debug('in list_schedulelogs_list_x:')
         try: 
-            page = request.args.get('page')
-            size = request.args.get('size')
+            page = int(request.args.get('page'))
+            size = int(request.args.get('size'))
             status = request.args.get('status')
-            schedulelogs = ScheduleLog.select().where(ScheduleLog.status==status)
+            schedulelogs = ScheduleLog.select().where(ScheduleLog.status==status).paginate(page+1, size)
             schedulelogsJson = '{"content": [], "totalPages": 0}'
             if (len(schedulelogs) > 0):
-                schedulelogsJson = wrap(schedulelogs)
+                count = len(ScheduleLog.select().where(ScheduleLog.status==status))
+                totalPages = int(count / size) + 1 if count % size != 0 else 0
+                schedulelogsJson = wrap(schedulelogs, totalPages)
             self.logger.debug('schedulelogsJson:' + schedulelogsJson)
             http200okresponse.set_data(schedulelogsJson)
             return http200okresponse
