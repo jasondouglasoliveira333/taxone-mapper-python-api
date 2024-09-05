@@ -125,11 +125,13 @@ class ScheduleLogIntergrationError(BaseModel):
     
 
 
+NoteThroughDeferred = DeferredThroughModel()
+
 class SAFXTable(BaseModel):
     name = TextField()
     description = TextField()
     dsTable = ForeignKeyField(DSTable, backref='safxTables', null=True)
-    schedule = ForeignKeyField(Schedule, backref='safxTables', null=True)    
+    schedules = ManyToManyField(Schedule, backref='safxTables', through_model=NoteThroughDeferred)    
 
     def toJson(self):
         dsTableId = ''
@@ -171,8 +173,16 @@ class Criteria(BaseModel):
         return '{' + '"id" : ' + str(self.id) + ',' + '"operator" : "' + self.operator + '",' + '"value" : "' + self.value + '",' + '"safxColumn" : ' + safxColumnJson + ' }'
 
 
+class SAFXTableSchedule(BaseModel):
+    safxTable = ForeignKeyField(SAFXTable)
+    schedule = ForeignKeyField(Schedule)
 
-db.create_tables([Email, User, Upload, DataSourceConfiguration, DSTable, DSColumn, SAFXTable, SAFXColumn, Schedule, ScheduleLog, ScheduleLogIntergrationError, Criteria])
+    class Meta:
+        primary_key = False
+
+NoteThroughDeferred.set_model(SAFXTableSchedule)
+
+db.create_tables([Email, User, Upload, DataSourceConfiguration, DSTable, DSColumn, SAFXTable, SAFXColumn, Schedule, ScheduleLog, ScheduleLogIntergrationError, Criteria, SAFXTable.schedules.get_through_model()])
 
 
 

@@ -2,6 +2,7 @@ import sys
 import io
 import logging
 import json
+import datetime
 from flask import Response, request, jsonify
 from flask_restful import Resource, Api
 from werkzeug.datastructures import * #.Headers
@@ -49,17 +50,32 @@ class ScheduleObjectController(Resource):
         self.logger.debug('>>>schedule[\'criterias\']:')
         self.logger.debug(schedule['criterias'])
         criterias = schedule['criterias'][:] #shallow copy
-        del schedule['userName']
+        if schedule.get('userName') != None:
+            del schedule['userName']
         del schedule['safxTables']
         del schedule['criterias']
-        scheduleQuery = Schedule.update(**schedule).where(Schedule.id==schedule.get('id'))
+        if schedule.get('id'):
+            scheduleQuery = Schedule.update(**schedule).where(Schedule.id==schedule.get('id'))
+        else:
+            schedule['status'] = 'ACTIVE'
+            schedule['lastExecution'] = datetime.datetime.now()
+            users = User.select().where(User.id == 1)
+            user = users[0]
+            scheduleQuery = Schedule.insert(**schedule,user=user)
         self.logger.debug('scheduleQuery.sql():')
         self.logger.debug(scheduleQuery.sql())
-        scheduleQuery.execute()
+        newId = scheduleQuery.execute()
+        if schedule.get('id') == None:
+            schedule['id'] = newId
         scheduleEntity = Schedule.get(schedule.get('id'))
         for safxTable in safxTables:
-            safxTable.schedule = scheduleEntity
-            safxTable.save()
+            associated = False
+            for scheduleAssociated in safxTable.schedules:
+                if scheduleAssociated.id == scheduleEntity.id:
+                    associated = True
+            if associated == False:
+                safxTable.schedules.add(scheduleEntity)
+                safxTable.save()
 
         criteriasToRemove = []
         for criteriaStored in scheduleEntity.criterias:
@@ -97,7 +113,7 @@ class ScheduleObjectController(Resource):
     def get(self, id):
         self.logger.debug('in get_schedule:' + str(id))
         try: 
-            schedule = Schedule.get(id)
+            schedule = Schedule.get(int(id))
             schedulesJson = schedule.toJson()
             self.logger.debug('schedulesJson:' + schedulesJson)
             http200okresponse.set_data(schedulesJson)
@@ -113,7 +129,7 @@ class SchedulePeriodsController(Resource):
     def get(self, id):
         self.logger.debug('in get_schedule_period:' + str(id))
         try: 
-            schedule = Schedule.get(id)
+            schedule = Schedule.get(int(id))
             schedulesJson = '{ "days" : "' + schedule.days + '", "hours": "' + schedule.hours + '" } '
             self.logger.debug('schedulesJson:' + schedulesJson)
             http200okresponse.set_data(schedulesJson)
