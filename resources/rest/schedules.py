@@ -47,8 +47,6 @@ class ScheduleObjectController(Resource):
             safxTableEntity = SAFXTable.get(safxTable.get('id'))
             safxTables.append(safxTableEntity)
         
-        self.logger.debug('>>>schedule[\'criterias\']:')
-        self.logger.debug(schedule['criterias'])
         criterias = schedule['criterias'][:] #shallow copy
         if schedule.get('userName') != None:
             del schedule['userName']
@@ -62,8 +60,6 @@ class ScheduleObjectController(Resource):
             users = User.select().where(User.id == 1)
             user = users[0]
             scheduleQuery = Schedule.insert(**schedule,user=user)
-        self.logger.debug('scheduleQuery.sql():')
-        self.logger.debug(scheduleQuery.sql())
         newId = scheduleQuery.execute()
         if schedule.get('id') == None:
             schedule['id'] = newId
@@ -91,14 +87,10 @@ class ScheduleObjectController(Resource):
             else:
                 criteriaQuery = Criteria.insert(**criteria, schedule = scheduleEntity, safxColumn=safxColumn)
                 criteriaQuery.execute()
-                self.logger.debug('criteriaQuery.sql():')
-                self.logger.debug(criteriaQuery.sql())
 
         #remove old criterias
         if len(criteriasToRemove) > 0:
             criteriaDeleteQuery = Criteria.delete().where(Criteria.id.in_(criteriasToRemove))
-            self.logger.debug('criteriaDeleteQuery.sql():')
-            self.logger.debug(criteriaDeleteQuery.sql())
             criteriaDeleteQuery.execute()
         return http200okresponse
 
@@ -106,7 +98,6 @@ class ScheduleObjectController(Resource):
         self.logger.debug('in delete_shedule:' + str(id))
         q = Schedule.delete().where(Schedule.id==id)
         q.execute()
-        self.logger.debug('deleted')
         return http200okresponse
 
 
@@ -115,7 +106,6 @@ class ScheduleObjectController(Resource):
         try: 
             schedule = Schedule.get(int(id))
             schedulesJson = schedule.toJson()
-            self.logger.debug('schedulesJson:' + schedulesJson)
             http200okresponse.set_data(schedulesJson)
             return http200okresponse
         except:    
@@ -131,7 +121,6 @@ class SchedulePeriodsController(Resource):
         try: 
             schedule = Schedule.get(int(id))
             schedulesJson = '{ "days" : "' + schedule.days + '", "hours": "' + schedule.hours + '" } '
-            self.logger.debug('schedulesJson:' + schedulesJson)
             http200okresponse.set_data(schedulesJson)
             return http200okresponse
         except:    
