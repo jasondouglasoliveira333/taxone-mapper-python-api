@@ -1,32 +1,5 @@
 
     
-class Schedule(BaseModel):
-    name = TextField()
-    status = TextField()
-    days = TextField()
-    hours = TextField()
-    lastExecution = DateTimeField()
-    user = ForeignKeyField(User, backref='schedules')
-    
-    def toJson(self):
-        safxTablesJson = '[]'
-        criteriasJson = '[]'
-        if len(self.safxTables) > 0:
-            safxTablesJson = '['
-            for safxTable in self.safxTables:
-                safxTableJson = '{ "id":' + str(safxTable.id) + ', "name": "' + safxTable.name + '"},'
-                safxTablesJson = safxTablesJson + safxTableJson
-            safxTablesJson = safxTablesJson[0:len(safxTablesJson)-1] + ']'
-
-        if len(self.criterias) > 0:
-            criteriasJson = '['
-            for criteria in self.criterias:      
-                criteriasJson = criteriasJson + criteria.toJson() + ','
-            criteriasJson = criteriasJson[0:len(criteriasJson)-1] + ']'
-                  
-        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"status" : "' + self.status + '",' + '"userName" : "' + self.user.name + '", "safxTables": ' + safxTablesJson + ', "criterias": ' + criteriasJson + ' }'
-    
-    
 class ScheduleLog(BaseModel):
     numLote = TextField()
     executionDate = DateTimeField()

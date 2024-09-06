@@ -2,12 +2,12 @@ import io
 import logging
 from flask import Flask, Response
 from flask_restful import Resource, Api
-#from resources.rest.sqlaclchemy.email import *
+from resources.rest.sqlalchemy.email import *
 from resources.rest.sqlalchemy.upload import *
 from resources.rest.sqlalchemy.dataSourceConfig import *
 from resources.rest.sqlalchemy.safxtable import *
 from resources.rest.sqlalchemy.dstable import *
-#from resources.rest.sqlalchemy.schedules import *
+from resources.rest.sqlalchemy.schedules import *
 #from resources.rest.sqlalchemy.schedulelog import *
 
 logging.basicConfig(filename='api_taxone_flask_restfull.log', level=logging.DEBUG)
@@ -32,8 +32,8 @@ class OURFlask(Flask):
 app = OURFlask(__name__)
 api = Api(app)
 
-#api.add_resource(EmailController, '/emails')
-#api.add_resource(EmailByIdController, '/emails/<id>')
+api.add_resource(EmailController, '/emails')
+api.add_resource(EmailByIdController, '/emails/<id>')
 api.add_resource(UploadController, '/uploads')
 api.add_resource(DataSourceConfigsController, '/dataSourceConfigs')
 api.add_resource(DataSourceConfigsDSTableController, '/dataSourceConfigs/<dataSourceType>/dsTables')
@@ -46,6 +46,9 @@ api.add_resource(SAFXTableObjectController, '/safxTables/<id>')
 api.add_resource(SAFXTableDSTableController, '/safxTables/<id>/dsTables/<dsTableId>')
 api.add_resource(DSTableController, '/dsTables')
 api.add_resource(DSColumnController, '/dsTables/<id>/dsColumns')
+api.add_resource(ScheduleListController, '/schedules')
+api.add_resource(ScheduleObjectController, '/schedules', '/schedules/<id>')
+api.add_resource(SchedulePeriodsController, '/schedules/<id>/periodes')
 
 
 if __name__ == '__main__':

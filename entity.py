@@ -119,7 +119,10 @@ class SAFXTable(BaseModel):
     safxColumns: Mapped[List["SAFXColumn"]] = relationship(
         back_populates="safxTable"
     )
-    #dsTable = ForeignKeyField(DSTable, backref='safxTables', null=True)
+    
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
+    schedule: Mapped["Schedule"] = relationship()
+    
     #schedules = ManyToManyField(Schedule, backref='safxTables', through_model=NoteThroughDeferred)    
 
     def toJson(self):
@@ -143,12 +146,8 @@ class SAFXColumn(BaseModel):
     
     safxTable_id: Mapped[int] = mapped_column(ForeignKey("safxtable.id")) #table name
     safxTable: Mapped["SAFXTable"] = relationship(back_populates="safxColumns")
-    dsColumn_id: Mapped[int] = mapped_column(ForeignKey("dscolumn.id")) #table name
+    dsColumn_id: Mapped[int] = mapped_column(ForeignKey("dscolumn.id"), nullable=True) #table name
     dsColumn: Mapped["DSColumn"] = relationship()
-
-
-    #safxTable = ForeignKeyField(SAFXTable, backref='SAFXColumns')
-    #dsColumn = ForeignKeyField(DSColumn, backref='SAFXColumns', null=True)
 
     def toJson(self):
         dsColumnId = ''
@@ -169,11 +168,51 @@ class Criteria(BaseModel):
     safxColumn_id: Mapped[int] = mapped_column(ForeignKey("safxcolumn.id")) #table name
     safxColumn: Mapped["SAFXColumn"] = relationship()
     
-    #safxColumn = ForeignKeyField(SAFXColumn)
-    #schedule = ForeignKeyField(Schedule, backref='criterias')
-
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
+    schedule: Mapped["Schedule"] = relationship() 
+ 
     def toJson(self):
         safxColumnJson = '{"id" :' + str(self.safxColumn.id) + ', "name": "' + self.safxColumn.name + '", '
         safxColumnJson = safxColumnJson + '"safxTable" : {"id": ' + str(self.safxColumn.safxTable.id) + '} }'
         return '{' + '"id" : ' + str(self.id) + ',' + '"operator" : "' + self.operator + '",' + '"value" : "' + self.value + '",' + '"safxColumn" : ' + safxColumnJson + ' }'
 
+    
+class Schedule(BaseModel):
+    __tablename__ = "schedule"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    status: Mapped[str] = mapped_column(String(10))
+    days: Mapped[str] = mapped_column(String(255))
+    hours: Mapped[str] = mapped_column(String(255))
+    lastExecution: Mapped[datetime.datetime] = mapped_column(DateTime)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id")) #table name
+    user: Mapped["User"] = relationship()
+    
+    safxTables: Mapped[List["SAFXTable"]] = relationship(
+        back_populates="schedule"
+    )
+
+    criterias: Mapped[List["Criteria"]] = relationship(
+        back_populates="schedule"
+    )
+    
+    def toJson(self):
+        safxTablesJson = '[]'
+        criteriasJson = '[]'
+        if len(self.safxTables) > 0:
+            safxTablesJson = '['
+            for safxTable in self.safxTables:
+                safxTableJson = '{ "id":' + str(safxTable.id) + ', "name": "' + safxTable.name + '"},'
+                safxTablesJson = safxTablesJson + safxTableJson
+            safxTablesJson = safxTablesJson[0:len(safxTablesJson)-1] + ']'
+
+        if len(self.criterias) > 0:
+            criteriasJson = '['
+            for criteria in self.criterias:      
+                criteriasJson = criteriasJson + criteria.toJson() + ','
+            criteriasJson = criteriasJson[0:len(criteriasJson)-1] + ']'
+                  
+        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"status" : "' + self.status + '",' + '"userName" : "' + self.user.name + '", "safxTables": ' + safxTablesJson + ', "criterias": ' + criteriasJson + ' }'
+    
