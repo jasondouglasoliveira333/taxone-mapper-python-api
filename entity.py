@@ -4,13 +4,13 @@ from typing import List
 from typing import Optional
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime, Boolean
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-engine = create_engine("postgresql+psycopg2://conam:conam123@localhost:5432/taxone_python")
+engine = create_engine("postgresql+psycopg2://conam:conam123@localhost:5432/taxone_python") #, echo=True)
 
 class BaseModel(DeclarativeBase):
     pass
@@ -104,4 +104,76 @@ class DSColumn(BaseModel):
 
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"columnType" : "' + self.columnType + '",' + '"size" : ' + str(self.size) + ',' + '"dsTable" : {"name": "' + self.dsTable.name + '" } }'
+
+
+class SAFXTable(BaseModel):
+    __tablename__ = "safxtable"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(255))
+
+    dsTable_id: Mapped[int] = mapped_column(ForeignKey("dstable.id")) #table name
+    dsTable: Mapped["DSTable"] = relationship()
+    
+    safxColumns: Mapped[List["SAFXColumn"]] = relationship(
+        back_populates="safxTable"
+    )
+    #dsTable = ForeignKeyField(DSTable, backref='safxTables', null=True)
+    #schedules = ManyToManyField(Schedule, backref='safxTables', through_model=NoteThroughDeferred)    
+
+    def toJson(self):
+        dsTableId = ''
+        dsTableName = ''
+        if self.dsTable:
+            dsTableId = self.dsTable.id
+            dsTableName = self.dsTable.name
+        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"description" : "' + self.description + '",' + '"dsTableId" : "' + str(dsTableId) + '",' + '"dsTableName" : "' + dsTableName + '"}'
+
+    
+class SAFXColumn(BaseModel):
+    __tablename__ = "safxcolumn"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    columnType: Mapped[str] = mapped_column(String(255))
+    required: Mapped[bool] = mapped_column(Boolean)
+    position: Mapped[int] = mapped_column(Integer)
+    size: Mapped[int] = mapped_column(Integer)
+    
+    safxTable_id: Mapped[int] = mapped_column(ForeignKey("safxtable.id")) #table name
+    safxTable: Mapped["SAFXTable"] = relationship(back_populates="safxColumns")
+    dsColumn_id: Mapped[int] = mapped_column(ForeignKey("dscolumn.id")) #table name
+    dsColumn: Mapped["DSColumn"] = relationship()
+
+
+    #safxTable = ForeignKeyField(SAFXTable, backref='SAFXColumns')
+    #dsColumn = ForeignKeyField(DSColumn, backref='SAFXColumns', null=True)
+
+    def toJson(self):
+        dsColumnId = ''
+        dsColumnName = ''
+        if self.dsColumn:
+            dsColumnId = self.dsColumn.id
+            dsColumnName = self.dsColumn.name
+        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"columnType" : "' + self.columnType + '",' + '"required" : ' + str(self.required).lower() + ',' + '"position" : ' + str(self.position) + ',' + '"size" : ' + str(self.size) + ','  + '"dsColumnId" : "' + str(dsColumnId) + '",' + '"dsColumnName" : "' + dsColumnName + '"}'
+
+
+class Criteria(BaseModel):
+    __tablename__ = "criteria"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    operator: Mapped[str] = mapped_column(String(255))
+    value: Mapped[str] = mapped_column(String(255))
+
+    safxColumn_id: Mapped[int] = mapped_column(ForeignKey("safxcolumn.id")) #table name
+    safxColumn: Mapped["SAFXColumn"] = relationship()
+    
+    #safxColumn = ForeignKeyField(SAFXColumn)
+    #schedule = ForeignKeyField(Schedule, backref='criterias')
+
+    def toJson(self):
+        safxColumnJson = '{"id" :' + str(self.safxColumn.id) + ', "name": "' + self.safxColumn.name + '", '
+        safxColumnJson = safxColumnJson + '"safxTable" : {"id": ' + str(self.safxColumn.safxTable.id) + '} }'
+        return '{' + '"id" : ' + str(self.id) + ',' + '"operator" : "' + self.operator + '",' + '"value" : "' + self.value + '",' + '"safxColumn" : ' + safxColumnJson + ' }'
 

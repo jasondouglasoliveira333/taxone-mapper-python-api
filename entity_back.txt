@@ -65,51 +65,6 @@ class ScheduleLogIntergrationError(BaseModel):
 
 NoteThroughDeferred = DeferredThroughModel()
 
-class SAFXTable(BaseModel):
-    name = TextField()
-    description = TextField()
-    dsTable = ForeignKeyField(DSTable, backref='safxTables', null=True)
-    schedules = ManyToManyField(Schedule, backref='safxTables', through_model=NoteThroughDeferred)    
-
-    def toJson(self):
-        dsTableId = ''
-        dsTableName = ''
-        if self.dsTable:
-            dsTableId = self.dsTable.id
-            dsTableName = self.dsTable.name
-        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"description" : "' + self.description + '",' + '"dsTableId" : "' + str(dsTableId) + '",' + '"dsTableName" : "' + dsTableName + '"}'
-
-    
-class SAFXColumn(BaseModel):
-    name = TextField()
-    columnType = TextField()
-    required = BooleanField()
-    position = IntegerField()
-    size = IntegerField()
-    safxTable = ForeignKeyField(SAFXTable, backref='SAFXColumns')
-    dsColumn = ForeignKeyField(DSColumn, backref='SAFXColumns', null=True)
-
-    def toJson(self):
-        dsColumnId = ''
-        dsColumnName = ''
-        if self.dsColumn:
-            dsColumnId = self.dsColumn.id
-            dsColumnName = self.dsColumn.name
-        return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"columnType" : "' + self.columnType + '",' + '"required" : ' + str(self.required).lower() + ',' + '"position" : ' + str(self.position) + ',' + '"size" : ' + str(self.size) + ','  + '"dsColumnId" : "' + str(dsColumnId) + '",' + '"dsColumnName" : "' + dsColumnName + '"}'
-
-
-class Criteria(BaseModel):
-    operator = TextField()
-    value = TextField()
-    #private String additionalValue = TextField()
-    safxColumn = ForeignKeyField(SAFXColumn)
-    schedule = ForeignKeyField(Schedule, backref='criterias')
-
-    def toJson(self):
-        safxColumnJson = '{"id" :' + str(self.safxColumn.id) + ', "name": "' + self.safxColumn.name + '", '
-        safxColumnJson = safxColumnJson + '"safxTable" : {"id": ' + str(self.safxColumn.safxTable.id) + '} }'
-        return '{' + '"id" : ' + str(self.id) + ',' + '"operator" : "' + self.operator + '",' + '"value" : "' + self.value + '",' + '"safxColumn" : ' + safxColumnJson + ' }'
-
 
 class SAFXTableSchedule(BaseModel):
     safxTable = ForeignKeyField(SAFXTable)

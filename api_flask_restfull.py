@@ -6,7 +6,7 @@ from flask_restful import Resource, Api
 from resources.rest.sqlalchemy.upload import *
 from resources.rest.sqlalchemy.dataSourceConfig import *
 from resources.rest.sqlalchemy.safxtable import *
-#from resources.rest.sqlalchemy.dstable import *
+from resources.rest.sqlalchemy.dstable import *
 #from resources.rest.sqlalchemy.schedules import *
 #from resources.rest.sqlalchemy.schedulelog import *
 
