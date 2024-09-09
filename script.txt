@@ -37,5 +37,9 @@ insert into schedulelogintergrationerror (id,"numeroReg","codigoErro","descricao
 values (2, 1, '30', 'Tamanho maior que 40 caracteres', 'RG', '2', 4) 
 
 
+create table safxtable_schedule (safxtable_id int, schedule_id int, FOREIGN KEY (safxtable_id) REFERENCES safxtable(id), FOREIGN KEY (schedule_id) REFERENCES schedule(id))
+
+
+
 
 

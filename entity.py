@@ -2,8 +2,10 @@ import datetime
 
 from typing import List
 from typing import Optional
+from sqlalchemy import Column
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey
+from sqlalchemy import Table
 from sqlalchemy import Integer, String, DateTime, Boolean
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
@@ -105,6 +107,15 @@ class DSColumn(BaseModel):
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"columnType" : "' + self.columnType + '",' + '"size" : ' + str(self.size) + ',' + '"dsTable" : {"name": "' + self.dsTable.name + '" } }'
 
+# note for a Core table, we use the sqlalchemy.Column construct,
+# not sqlalchemy.orm.mapped_column
+safxtable_schedule_table = Table(
+    "safxtable_schedule",
+    BaseModel.metadata,
+    Column("safxTable_id", ForeignKey("safxtable.id")),
+    Column("schedule_id", ForeignKey("schedule.id")),
+)    
+
 
 class SAFXTable(BaseModel):
     __tablename__ = "safxtable"
@@ -120,10 +131,11 @@ class SAFXTable(BaseModel):
         back_populates="safxTable"
     )
     
-    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
-    schedule: Mapped["Schedule"] = relationship()
-    
-    #schedules = ManyToManyField(Schedule, backref='safxTables', through_model=NoteThroughDeferred)    
+    #schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
+    #schedule: Mapped["Schedule"] = relationship()
+    schedules: Mapped[List["Schedule"]] = relationship(secondary=safxtable_schedule_table, 
+        back_populates="safxTables"
+    )
 
     def toJson(self):
         dsTableId = ''
@@ -177,6 +189,7 @@ class Criteria(BaseModel):
         return '{' + '"id" : ' + str(self.id) + ',' + '"operator" : "' + self.operator + '",' + '"value" : "' + self.value + '",' + '"safxColumn" : ' + safxColumnJson + ' }'
 
     
+    
 class Schedule(BaseModel):
     __tablename__ = "schedule"
     
@@ -190,12 +203,12 @@ class Schedule(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id")) #table name
     user: Mapped["User"] = relationship()
     
-    safxTables: Mapped[List["SAFXTable"]] = relationship(
+    criterias: Mapped[List["Criteria"]] = relationship(
         back_populates="schedule"
     )
 
-    criterias: Mapped[List["Criteria"]] = relationship(
-        back_populates="schedule"
+    safxTables: Mapped[List["SAFXTable"]] = relationship(secondary=safxtable_schedule_table, 
+        back_populates="schedules"
     )
     
     def toJson(self):
@@ -268,3 +281,4 @@ class ScheduleLogIntergrationError(BaseModel):
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"numeroReg" : "' + str(self.numeroReg) + '",' + '"codigoErro" : "' + self.codigoErro + '",' + '"descricaoErro" : "' + self.descricaoErro + '",' + '"nomeCampo" : "' + self.nomeCampo + '",' + '"chaveRegistro" : "' + self.chaveRegistro + '" }'
     
+

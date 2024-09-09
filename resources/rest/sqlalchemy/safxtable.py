@@ -23,10 +23,11 @@ class SAFXTableListController(Resource):
             size = int(request.args.get('size'))
             safxtablesStt = select(SAFXTable).limit(size).offset((page)*size)
             safxtables = session.scalars(safxtablesStt).fetchall()
-            #safxtables = SAFXTable.select().paginate(page+1, size)
             safxtablesJson = '{"content": [], "totalPages": 0}'
             if (len(safxtables) > 0):
-                count = len(safxtables) #SAFXTable.select())
+                safxtablesAllStt = select(SAFXTable).limit(size).offset((page)*size)
+                safxtablesAll = session.scalars(safxtablesAllStt).fetchall()
+                count = len(safxtablesAll)
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 safxtablesJson = wrap(safxtables, totalPages)
             self.logger.debug('safxtablesJson:' + safxtablesJson)
@@ -46,7 +47,6 @@ class SAFXTableColumnsController(Resource):
         try: 
             safxcolumnsStt = select(SAFXColumn).join(SAFXTable).where(SAFXTable.id==int(id))
             safxcolumns = session.scalars(safxcolumnsStt).fetchall()
-            #safxcolumns = SAFXColumn.select().join(SAFXTable).where(SAFXTable.id==id)
             safxcolumnsJson = '[]'
             if (len(safxcolumns) > 0):
                 safxcolumnsJson = wraplist(safxcolumns)
@@ -71,11 +71,9 @@ class SAFXTableColumnsController(Resource):
             if dsColumnId:
                 dsColumnsStt = select(DSColumn).where(DSColumn.id==dsColumnId)
                 dsColumns = session.scalars(dsColumnsStt).fetchall()
-                #dsColumns = DSColumn.select().where(DSColumn.id==dsColumnId)
                 dsColumn = dsColumns[0]
             safxColumnEntitysStt = select(SAFXColumn).where(SAFXColumn.id==safxcolumn['id'])
             safxColumnEntitys = session.scalars(safxColumnEntitysStt).fetchall()
-            #safxColumnEntitys = SAFXColumn.select().where(SAFXColumn.id==safxcolumn['id'])
             safxColumnEntity = safxColumnEntitys[0]
             safxColumnEntity.dsColumn=dsColumn
             session.add(safxColumnEntity)
@@ -130,13 +128,10 @@ class SAFXTableDSTableController(Resource):
         dsTablesStt = select(DSTable).where(DSTable.id==dsTableId)
         dsTables = session.scalars(dsTablesStt).fetchall()
         dsTable = dsTables[0]
-        #dsTable = DSTable.select().where(DSTable.id==dsTableId)
-        #safxTable = SAFXTable.update(dsTable=dsTable).where(SAFXTable.id == id)
         safxTablesStt = select(SAFXTable).where(SAFXTable.id == id)
         safxTables = session.scalars(safxTablesStt).fetchall()
         safxTable = safxTables[0]
         self.logger.debug('safxTable.sql():')
-        #self.logger.debug(safxTable.sql())
         session.add(safxTable)
         session.commit()
         return http200okresponse

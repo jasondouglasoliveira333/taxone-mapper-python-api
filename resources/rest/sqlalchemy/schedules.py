@@ -8,7 +8,7 @@ from flask import Response, request, jsonify
 from flask_restful import Resource, Api
 
 from sqlalchemy.orm import Session
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, insert, update
 
 from entity import *
 from util import *
@@ -26,7 +26,9 @@ class ScheduleListController(Resource):
             schedules = session.scalars(schedulesStt).fetchall()            
             schedulesJson = '{"content": [], "totalPages": 0}'
             if (len(schedules) > 0):
-                count = len(schedules)#Schedule.select())
+                schedulesAllStt = select(Schedule).limit(size).offset((page)*size)
+                schedulesAll = session.scalars(schedulesAllStt).fetchall()            
+                count = len(schedulesAll)
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 schedulesJson = wrap(schedules)
             self.logger.debug('schedulesJson:' + schedulesJson)
@@ -50,7 +52,8 @@ class ScheduleObjectController(Resource):
         self.logger.debug('scheduleBytes:' + str(scheduleBytes.getvalue(), encoding='utf-8'))    
         safxTables = []
         for safxTable in schedule['safxTables']:
-            safxTableEntity = SAFXTable.get(safxTable.get('id'))
+            safxtablesStt = select(SAFXTable).where(SAFXTable.id==safxTable.get('id'))
+            safxTableEntity = session.scalars(safxtablesStt).one()
             safxTables.append(safxTableEntity)
         
         criterias = schedule['criterias'][:] #shallow copy
@@ -58,26 +61,41 @@ class ScheduleObjectController(Resource):
             del schedule['userName']
         del schedule['safxTables']
         del schedule['criterias']
-        if schedule.get('id'):
-            scheduleQuery = Schedule.update(**schedule).where(Schedule.id==schedule.get('id'))
-        else:
+        newId = None
+        if schedule.get('id') == None: #new
             schedule['status'] = 'ACTIVE'
             schedule['lastExecution'] = datetime.datetime.now()
-            users = User.select().where(User.id == 1)
-            user = users[0]
-            scheduleQuery = Schedule.insert(**schedule,user=user)
-        newId = scheduleQuery.execute()
+            usersStt = select(User).where(User.id==1)
+            user = session.scalars(usersStt).one()
+            scheduleInsert = insert(Schedule).values(**schedule, user_id=user.id)
+            self.logger.debug('scheduleInsert:')
+            self.logger.debug(scheduleInsert)
+            result = session.execute(scheduleInsert)
+            self.logger.debug('result:')
+            self.logger.debug(result)
+            newId = result.inserted_primary_key[0]
+            self.logger.debug('newId:' + int(newId) + ' - dir' + newId.__class__)
+        else:
+            scheduleCopy = schedule.copy()
+            del scheduleCopy['id']
+            scheduleUpdate = update(Schedule).values(**scheduleCopy).where(Schedule.id==schedule.get('id'))
+            self.logger.debug('scheduleUpdate:')
+            self.logger.debug(scheduleUpdate)
+            session.execute(scheduleUpdate) #update
+            
         if schedule.get('id') == None:
             schedule['id'] = newId
-        scheduleEntity = Schedule.get(schedule.get('id'))
+
+        scheduleStt = select(Schedule).where(Schedule.id==schedule.get('id'))
+        scheduleEntity = session.scalars(scheduleStt).one()
         for safxTable in safxTables:
             associated = False
             for scheduleAssociated in safxTable.schedules:
                 if scheduleAssociated.id == scheduleEntity.id:
                     associated = True
             if associated == False:
-                safxTable.schedules.add(scheduleEntity)
-                safxTable.save()
+                safxTable.schedules.append(scheduleEntity)
+                session.add(safxTable)
 
         criteriasToRemove = []
         for criteriaStored in scheduleEntity.criterias:
@@ -86,18 +104,26 @@ class ScheduleObjectController(Resource):
         for criteria in criterias:
             criteriaQuery = None
             safxColumnId = criteria.get('safxColumn').get('id')
-            safxColumn = SAFXColumn.get(SAFXColumn.id==safxColumnId)
+
+            safxColumnStt = select(SAFXColumn).where(SAFXColumn.id==safxColumnId)
+            safxColumn = session.scalars(safxColumnStt).one()
+
             del criteria['safxColumn']
             if criteria.get('id'):
                 criteriasToRemove.remove(criteria.get('id'))
             else:
-                criteriaQuery = Criteria.insert(**criteria, schedule = scheduleEntity, safxColumn=safxColumn)
-                criteriaQuery.execute()
+                criteriaEntity = Criteria(**criteria)
+                criteriaEntity.schedule = scheduleEntity
+                criteriaEntity.safxColumn = safxColumn
+                session.add(criteriaEntity)
 
         #remove old criterias
         if len(criteriasToRemove) > 0:
-            criteriaDeleteQuery = Criteria.delete().where(Criteria.id.in_(criteriasToRemove))
-            criteriaDeleteQuery.execute()
+            for creteriaId in criteriasToRemove:
+                criteriaDeleteQuery = delete(Criteria).where(Criteria.id == criteriaId)
+                session.execute(criteriaDeleteQuery)
+                
+        session.commit()        
         return http200okresponse
 
     def delete(self, id):

@@ -28,7 +28,9 @@ class ScheduleLogListController(Resource):
             schedulelogs = session.scalars(schedulelogsStt).fetchall()
             schedulelogsJson = '{"content": [], "totalPages": 0}'
             if (len(schedulelogs) > 0):
-                count = len(schedulelogs)#ScheduleLog.select().where(ScheduleLog.status==status))
+                schedulelogsAllStt = select(ScheduleLog).where(ScheduleLog.status==status)
+                schedulelogsAll = session.scalars(schedulelogsAllStt).fetchall()
+                count = len(schedulelogsAll)
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 schedulelogsJson = wrap(schedulelogs, totalPages)
             self.logger.debug('schedulelogsJson:' + schedulelogsJson)
@@ -80,7 +82,7 @@ class ScheduleLogObjectController(Resource):
         try: 
             session = Session(engine)
             schedulelogsStt = select(ScheduleLog).where(ScheduleLog.id==id)
-            schedulelog = session.scalars(schedulelogsStt).one()
+            scheduleLog = session.scalars(schedulelogsStt).one()
             scheduleLogsJson = scheduleLog.toJson()
             self.logger.debug('scheduleLogsJson:' + scheduleLogsJson)
             http200okresponse.set_data(scheduleLogsJson)
@@ -96,10 +98,9 @@ class ScheduleLogTaxOneErrorController(Resource):
     def get(self, id):
         self.logger.debug('in get_schedulelog_taxoneerror:' + str(id))
         try: 
-            #scheduleLog = ScheduleLog.get(int(id))
             session = Session(engine)
-            schedulelogsStt = select(ScheduleLog).where(ScheduleLog.id==id)
-            schedulelog = session.scalars(schedulelogsStt).one()
+            schedulelogsStt = select(ScheduleLog).where(ScheduleLog.id==int(id))
+            scheduleLog = session.scalars(schedulelogsStt).one()
             taxOneErrorsJson = '{"content": [], "totalPages": 0}'
             if (len(scheduleLog.taxOneErrors) > 0):
                 taxOneErrorsJson = wrap(scheduleLog.taxOneErrors)
