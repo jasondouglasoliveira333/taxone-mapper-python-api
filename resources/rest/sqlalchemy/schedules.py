@@ -22,9 +22,8 @@ class ScheduleListController(Resource):
         try: 
             page = int(request.args.get('page'))
             size = int(request.args.get('size'))
-            schedulesStt = select(Schedule)
+            schedulesStt = select(Schedule).limit(size).offset((page)*size)
             schedules = session.scalars(schedulesStt).fetchall()            
-            print('schedules', schedules, ' - len(schedules):', len(schedules))
             schedulesJson = '{"content": [], "totalPages": 0}'
             if (len(schedules) > 0):
                 count = len(schedules)#Schedule.select())
@@ -106,7 +105,6 @@ class ScheduleObjectController(Resource):
         session = Session(engine)
         schedulesStt = delete(Schedule).where(Schedule.id==id)
         schedule_r = session.execute(schedulesStt)
-        print('schedule_r:', schedule_r)
         session.commit()
         #q = Schedule.delete().where(Schedule.id==id)
         #q.execute()

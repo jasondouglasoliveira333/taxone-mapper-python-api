@@ -23,7 +23,6 @@ class EmailController(Resource):
             size = request.args.get('size')
             emailsStt = select(Email)
             emails = session.scalars(emailsStt).fetchall()
-            #emails = Email.select()
             emailsJson = '{"content": [], "totalPages": 0}'
             if (len(emails) > 0):
                 emailsJson = wrap(emails)

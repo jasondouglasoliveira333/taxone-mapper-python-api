@@ -21,7 +21,7 @@ class SAFXTableListController(Resource):
         try: 
             page = int(request.args.get('page'))
             size = int(request.args.get('size'))
-            safxtablesStt = select(SAFXTable)
+            safxtablesStt = select(SAFXTable).limit(size).offset((page)*size)
             safxtables = session.scalars(safxtablesStt).fetchall()
             #safxtables = SAFXTable.select().paginate(page+1, size)
             safxtablesJson = '{"content": [], "totalPages": 0}'

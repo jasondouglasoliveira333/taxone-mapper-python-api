@@ -1,0 +1,119 @@
+import sys
+import io
+import json
+import logging
+from datetime import datetime
+
+from flask import Response, request, jsonify
+from flask_restful import Resource, Api
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session 
+from sqlalchemy.sql import text
+
+from entity import *
+from util import *
+
+class ScheduleLogListController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogListController')
+    
+    def get(self):
+        self.logger.debug('in list_schedulelogs_list_x:')
+        try: 
+            session = Session(engine)
+            page = int(request.args.get('page'))
+            size = int(request.args.get('size'))
+            status = request.args.get('status')
+            schedulelogsStt = select(ScheduleLog).where(ScheduleLog.status==status).limit(size).offset((page)*size)
+            schedulelogs = session.scalars(schedulelogsStt).fetchall()
+            schedulelogsJson = '{"content": [], "totalPages": 0}'
+            if (len(schedulelogs) > 0):
+                count = len(schedulelogs)#ScheduleLog.select().where(ScheduleLog.status==status))
+                totalPages = int(count / size) + 1 if count % size != 0 else 0
+                schedulelogsJson = wrap(schedulelogs, totalPages)
+            self.logger.debug('schedulelogsJson:' + schedulelogsJson)
+            http200okresponse.set_data(schedulelogsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+class ScheduleLogStatisticsController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogStatisticsController')
+    
+    def get(self):
+        self.logger.debug('in list_schedulelogs_statistics:')
+        try: 
+            session = Session(engine)
+            schedulelogsStt = select(ScheduleLog)
+            schedulelogs = session.scalars(schedulelogsStt).fetchall()
+            PROCESSED = 0
+            PROCESSING = 0
+            ERROR_TAXONE = 0
+            for schedulelog in schedulelogs:
+                match schedulelog.status:
+                    case 'PROCESSED':
+                        PROCESSED = PROCESSED + 1
+                    case 'PROCESSING':
+                        PROCESSING = PROCESSING + 1
+                    case 'ERROR_TAXONE':
+                        ERROR_TAXONE = ERROR_TAXONE + 1
+            statistics = []
+            statistics.append({'status':'PROCESSED', 'quantity': PROCESSED})
+            statistics.append({'status':'PROCESSING', 'quantity': PROCESSING})
+            statistics.append({'status':'ERROR_TAXONE', 'quantity': ERROR_TAXONE})
+            statistics.append({'status':'SENT', 'quantity': 0})
+            statistics.append({'status':'PROCESSING_ERROR', 'quantity': 0})
+            statisticsJson = json.dumps(statistics)
+            http200okresponse.set_data(statisticsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+
+class ScheduleLogObjectController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogObjectController')
+    
+    def get(self, id):
+        self.logger.debug('in get_schedulelog:' + str(id))
+        try: 
+            session = Session(engine)
+            schedulelogsStt = select(ScheduleLog).where(ScheduleLog.id==id)
+            schedulelog = session.scalars(schedulelogsStt).one()
+            scheduleLogsJson = scheduleLog.toJson()
+            self.logger.debug('scheduleLogsJson:' + scheduleLogsJson)
+            http200okresponse.set_data(scheduleLogsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+
+class ScheduleLogTaxOneErrorController(Resource):
+    logger = logging.getLogger(__name__ + '.ScheduleLogTaxOneErrorController')
+        
+    def get(self, id):
+        self.logger.debug('in get_schedulelog_taxoneerror:' + str(id))
+        try: 
+            #scheduleLog = ScheduleLog.get(int(id))
+            session = Session(engine)
+            schedulelogsStt = select(ScheduleLog).where(ScheduleLog.id==id)
+            schedulelog = session.scalars(schedulelogsStt).one()
+            taxOneErrorsJson = '{"content": [], "totalPages": 0}'
+            if (len(scheduleLog.taxOneErrors) > 0):
+                taxOneErrorsJson = wrap(scheduleLog.taxOneErrors)
+            self.logger.debug('taxOneErrorsJson:' + taxOneErrorsJson)
+            http200okresponse.set_data(taxOneErrorsJson)
+            return http200okresponse
+        except:    
+            self.logger.debug('sys.exception():' + repr(sys.exception()))
+            return []
+
+
+
+
+#            schedulesRaw = session.execute(text('select * from schedule')).fetchall()
+#            for s in schedulesRaw:
+#                print('s:', s, ' - class:', s.__class__)
+

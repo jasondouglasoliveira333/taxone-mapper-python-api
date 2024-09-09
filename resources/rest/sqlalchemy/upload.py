@@ -20,13 +20,14 @@ class UploadController(Resource):
         try: 
             page = int(request.args.get('page'))
             size = int(request.args.get('size'))
-            uploadsStt = select(Upload)
+            uploadsStt = select(Upload).limit(size).offset((page)*size)
             uploads = session.scalars(uploadsStt).fetchall()
-            #print('uploads', dir(uploads))
             uploadsJson = '{"content": [], "totalPages": 0}'
             self.logger.debug('len(uploads):' + str(len(uploads)))
             if (len(uploads) > 0):
-                count = len(uploads) #len(Upload.select())
+                uploadsAllStt = select(Upload)
+                uploadsAll = session.scalars(uploadsAllStt).fetchall()
+                count = len(uploadsAll)
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 uploadsJson = wrap(uploads, totalPages)
             self.logger.debug('uploadsJson:' + uploadsJson)

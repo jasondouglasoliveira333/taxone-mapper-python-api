@@ -8,7 +8,7 @@ from resources.rest.sqlalchemy.dataSourceConfig import *
 from resources.rest.sqlalchemy.safxtable import *
 from resources.rest.sqlalchemy.dstable import *
 from resources.rest.sqlalchemy.schedules import *
-#from resources.rest.sqlalchemy.schedulelog import *
+from resources.rest.sqlalchemy.schedulelog import *
 
 logging.basicConfig(filename='api_taxone_flask_restfull.log', level=logging.DEBUG)
 
@@ -49,6 +49,10 @@ api.add_resource(DSColumnController, '/dsTables/<id>/dsColumns')
 api.add_resource(ScheduleListController, '/schedules')
 api.add_resource(ScheduleObjectController, '/schedules', '/schedules/<id>')
 api.add_resource(SchedulePeriodsController, '/schedules/<id>/periodes')
+api.add_resource(ScheduleLogListController, '/schedulelogs')
+api.add_resource(ScheduleLogStatisticsController, '/schedulelogs/statistics')
+api.add_resource(ScheduleLogObjectController, '/schedulelogs/<id>')
+api.add_resource(ScheduleLogTaxOneErrorController, '/schedulelogs/<id>/taxOneErrors')
 
 
 if __name__ == '__main__':

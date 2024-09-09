@@ -216,3 +216,55 @@ class Schedule(BaseModel):
                   
         return '{' + '"id" : ' + str(self.id) + ',' + '"name" : "' + self.name + '",' + '"status" : "' + self.status + '",' + '"userName" : "' + self.user.name + '", "safxTables": ' + safxTablesJson + ', "criterias": ' + criteriasJson + ' }'
     
+class ScheduleLog(BaseModel):
+    __tablename__ = "schedulelog"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    numLote: Mapped[str] = mapped_column(String(255))
+    executionDate: Mapped[datetime.datetime] = mapped_column(DateTime)
+    errorMessage: Mapped[str] = mapped_column(String(255))
+    status: Mapped[str] = mapped_column(String(10))
+    integrationStatus: Mapped[str] = mapped_column(String(255))
+    
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
+    schedule: Mapped["Schedule"] = relationship()
+
+    taxOneErrors: Mapped[List["ScheduleLogIntergrationError"]] = relationship(
+        back_populates="scheduleLog"
+    )
+
+    #schedule = ForeignKeyField(Schedule, backref='scheduleLogs')
+    #private List<ScheduleLogIntergrationError> taxOneErrors;
+    
+    def toJson(self):
+        return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '" }'
+    
+    def toJsonFull(self):
+        taxOneErrorsJson = '[]'
+        if len(self.taxOneErrors) > 0:
+            taxOneErrorsJson = '['
+            for taxOneError in self.taxOneErrors:      
+                taxOneErrorsJson = taxOneErrorsJson + taxOneError.toJson() + ','
+            taxOneErrorsJson = taxOneErrorsJson[0:len(taxOneErrorsJson)-1] + ']'
+
+        return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '", "taxOneErrors" : ' + taxOneErrorsJson + '}'
+    
+    
+class ScheduleLogIntergrationError(BaseModel):
+    __tablename__ = "schedulelogintergrationerror"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    numeroReg: Mapped[int] = mapped_column(Integer)
+    codigoErro: Mapped[str] = mapped_column(String(255))
+    descricaoErro: Mapped[str] = mapped_column(String(255))
+    nomeCampo: Mapped[str] = mapped_column(String(255))
+    chaveRegistro: Mapped[str] = mapped_column(String(255))
+
+    scheduleLog_id: Mapped[int] = mapped_column(ForeignKey("schedulelog.id")) #table name
+    scheduleLog: Mapped["ScheduleLog"] = relationship()
+    
+    #scheduleLog = ForeignKeyField(ScheduleLog, backref='taxOneErrors')
+    
+    def toJson(self):
+        return '{' + '"id" : ' + str(self.id) + ',' + '"numeroReg" : "' + str(self.numeroReg) + '",' + '"codigoErro" : "' + self.codigoErro + '",' + '"descricaoErro" : "' + self.descricaoErro + '",' + '"nomeCampo" : "' + self.nomeCampo + '",' + '"chaveRegistro" : "' + self.chaveRegistro + '" }'
+    
