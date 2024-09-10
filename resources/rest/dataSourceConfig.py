@@ -7,7 +7,7 @@ from flask import Response, request
 from flask_restful import Resource, Api
 
 from entity import *
-from util import *
+from util.util import *
 
 got_metadata = False
 
@@ -23,8 +23,7 @@ class DataSourceConfigsController(Resource):
             if (len(dataSourceConfigs) > 0):
                 dataSourceConfigsJson = wraplist(dataSourceConfigs)
             self.logger.debug('dataSourceConfigsJson:' + dataSourceConfigsJson)
-            http200okresponse.set_data(dataSourceConfigsJson)
-            return http200okresponse
+            return generate_http200ok(dataSourceConfigsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -45,8 +44,7 @@ class DataSourceConfigsDSTableController(Resource):
                 dSTables.append(dsTable)
                 dSTablesJson = wraplist(dSTables)
                 self.logger.debug('dSTablesJson:' + dSTablesJson)
-                http200okresponse.set_data(dSTablesJson)
-                return http200okresponse
+                return generate_http200ok(dSTablesJson)
             else:
                 page = request.args.get('page')
                 size = request.args.get('size')
@@ -56,8 +54,7 @@ class DataSourceConfigsDSTableController(Resource):
                 if (len(dSTables) > 0):
                     dSTablesJson = wraplist(dSTables)
                 self.logger.debug('dSTablesJson:' + dSTablesJson)
-                http200okresponse.set_data(dSTablesJson)
-                return http200okresponse
+                return generate_http200ok(dSTablesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -94,9 +91,8 @@ class DataSourceConfigsMetadataController(Resource):
             self.logger.debug('>>x')
             dSCsJson = wrap(dsColumnList)
             self.logger.debug('dSCsJson:' + dSCsJson)
-            http200okresponse.set_data(dSCsJson)
             got_metadata = True
-            return http200okresponse
+            return generate_http200ok(dSCsJson)
         except:
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -113,8 +109,7 @@ class DataSourceConfigsObjectController(Resource):
             dataSourceConfiguration = dataSourceConfigurations[0]
             dSCJson = dataSourceConfiguration.toJson()
             
-        http200okresponse.set_data(dSCJson)
-        return http200okresponse
+        return generate_http200ok(dSCJson)
         
     def post(self, dataSourceType):
         self.logger.debug('in insert_dsConfiguration - dataSourceType:' + dataSourceType)
@@ -138,6 +133,6 @@ class DataSourceConfigsObjectController(Resource):
         dsC.dsTable = dsTable
         dsC.save()
         self.logger.debug('dsC.save()')
-        return http200okresponse
+        return generate_http200ok()
 
         

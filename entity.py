@@ -131,8 +131,6 @@ class SAFXTable(BaseModel):
         back_populates="safxTable"
     )
     
-    #schedule_id: Mapped[int] = mapped_column(ForeignKey("schedule.id")) #table name
-    #schedule: Mapped["Schedule"] = relationship()
     schedules: Mapped[List["Schedule"]] = relationship(secondary=safxtable_schedule_table, 
         back_populates="safxTables"
     )
@@ -246,9 +244,6 @@ class ScheduleLog(BaseModel):
         back_populates="scheduleLog"
     )
 
-    #schedule = ForeignKeyField(Schedule, backref='scheduleLogs')
-    #private List<ScheduleLogIntergrationError> taxOneErrors;
-    
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"executionDate" : "' + str(self.executionDate) + '",' + '"status" : "' + self.status + '",' + '"scheduleName" : "' + self.schedule.name + '" }'
     
@@ -275,8 +270,6 @@ class ScheduleLogIntergrationError(BaseModel):
 
     scheduleLog_id: Mapped[int] = mapped_column(ForeignKey("schedulelog.id")) #table name
     scheduleLog: Mapped["ScheduleLog"] = relationship()
-    
-    #scheduleLog = ForeignKeyField(ScheduleLog, backref='taxOneErrors')
     
     def toJson(self):
         return '{' + '"id" : ' + str(self.id) + ',' + '"numeroReg" : "' + str(self.numeroReg) + '",' + '"codigoErro" : "' + self.codigoErro + '",' + '"descricaoErro" : "' + self.descricaoErro + '",' + '"nomeCampo" : "' + self.nomeCampo + '",' + '"chaveRegistro" : "' + self.chaveRegistro + '" }'

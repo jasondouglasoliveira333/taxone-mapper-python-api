@@ -7,7 +7,7 @@ from flask import Response, request
 from flask_restful import Resource, Api
 
 from entity import *
-from util import *
+from util.util import *
 
 class UploadController(Resource):
     logger = logging.getLogger(__name__ + '.UploadController')
@@ -24,8 +24,7 @@ class UploadController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 uploadsJson = wrap(uploads, totalPages)
             self.logger.debug('uploadsJson:' + uploadsJson)
-            http200okresponse.set_data(uploadsJson)
-            return http200okresponse
+            return generate_http200ok(uploadsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -48,7 +47,6 @@ class UploadController(Resource):
             upload.user = user
             upload.save()
             self.logger.debug('Saved')
-            return http200okresponse
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

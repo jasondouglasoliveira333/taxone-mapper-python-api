@@ -5,7 +5,7 @@ from flask import Response, request, jsonify
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 def list_schedulelogs():
     print('in list_schedulelogs:')
@@ -18,8 +18,7 @@ def list_schedulelogs():
         if (len(schedulelogs) > 0):
             schedulelogsJson = wrap(schedulelogs)
         print('schedulelogsJson:', schedulelogsJson)
-        http200okresponse.set_data(schedulelogsJson)
-        return http200okresponse
+        return generate_http200ok(schedulelogsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -46,8 +45,7 @@ def list_schedulelog_statistics():
         statistics.append({'status':'SENT', 'quantity': 0})
         statistics.append({'status':'PROCESSING_ERROR', 'quantity': 0})
         statisticsJson = json.dumps(statistics)
-        http200okresponse.set_data(statisticsJson)
-        return http200okresponse
+        return generate_http200ok(statisticsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []

@@ -5,7 +5,7 @@ import json
 from flask import Response, request
 
 from entity import *
-from util import *
+from util.util import *
 
 got_metadata = False
 
@@ -20,8 +20,7 @@ def list_data_source_configs():
         if (len(dataSourceConfigs) > 0):
             dataSourceConfigsJson = wraplist(dataSourceConfigs)
         print('dataSourceConfigsJson:', dataSourceConfigsJson)
-        http200okresponse.set_data(dataSourceConfigsJson)
-        return http200okresponse
+        return generate_http200ok(dataSourceConfigsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -38,8 +37,7 @@ def list_dsTables(dataSourceType):
             dSTables.append(dsTable)
             dSTablesJson = wraplist(dSTables)
             print('dSTablesJson:', dSTablesJson)
-            http200okresponse.set_data(dSTablesJson)
-            return http200okresponse
+            return generate_http200ok(dSTablesJson)
         else:
             page = request.args.get('page')
             size = request.args.get('size')
@@ -49,8 +47,7 @@ def list_dsTables(dataSourceType):
             if (len(dSTables) > 0):
                 dSTablesJson = wraplist(dSTables)
             print('dSTablesJson:', dSTablesJson)
-            http200okresponse.set_data(dSTablesJson)
-            return http200okresponse
+            return generate_http200ok(dSTablesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -79,9 +76,8 @@ def get_metadata(dataSourceType):
         print('>>x')
         dSCsJson = wrap(dsColumnList)
         print('dSCsJson:', dSCsJson)
-        http200okresponse.set_data(dSCsJson)
         got_metadata = True
-        return http200okresponse
+        return generate_http200ok(dSCsJson)
     except:
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -113,7 +109,7 @@ def insert_dsConfiguration(dataSourceType):
     dsC.dsTable = dsTable
     dsC.save()
     print('dsC.save()')
-    return http200okresponse
+    return generate_http200ok()
 
 def get_data_source_config(dataSourceType):
     print('in get_data_source_config - dataSourceType:', dataSourceType)
@@ -123,6 +119,5 @@ def get_data_source_config(dataSourceType):
         dataSourceConfiguration = dataSourceConfigurations[0]
         dSCJson = dataSourceConfiguration.toJson()
         
-    http200okresponse.set_data(dSCJson)
-    return http200okresponse
+    return generate_http200ok(dSCJson)
     

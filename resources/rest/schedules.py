@@ -8,7 +8,7 @@ from flask_restful import Resource, Api
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 class ScheduleListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleListController')
@@ -25,8 +25,7 @@ class ScheduleListController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 shedulesJson = wrap(shedules)
             self.logger.debug('shedulesJson:' + shedulesJson)
-            http200okresponse.set_data(shedulesJson)
-            return http200okresponse
+            return generate_http200ok(shedulesJson)
         except:    
             logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -92,26 +91,24 @@ class ScheduleObjectController(Resource):
         if len(criteriasToRemove) > 0:
             criteriaDeleteQuery = Criteria.delete().where(Criteria.id.in_(criteriasToRemove))
             criteriaDeleteQuery.execute()
-        return http200okresponse
+        
+        return generate_http200ok()
 
     def delete(self, id):
         self.logger.debug('in delete_shedule:' + str(id))
         q = Schedule.delete().where(Schedule.id==id)
         q.execute()
-        return http200okresponse
-
+        return generate_http200ok()
 
     def get(self, id):
         self.logger.debug('in get_schedule:' + str(id))
         try: 
             schedule = Schedule.get(int(id))
             schedulesJson = schedule.toJson()
-            http200okresponse.set_data(schedulesJson)
-            return http200okresponse
+            return generate_http200ok(schedulesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
-
 
 class SchedulePeriodsController(Resource):
     logger = logging.getLogger(__name__ + '.SchedulePeriodsController')
@@ -121,8 +118,7 @@ class SchedulePeriodsController(Resource):
         try: 
             schedule = Schedule.get(int(id))
             schedulesJson = '{ "days" : "' + schedule.days + '", "hours": "' + schedule.hours + '" } '
-            http200okresponse.set_data(schedulesJson)
-            return http200okresponse
+            return generate_http200ok(schedulesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

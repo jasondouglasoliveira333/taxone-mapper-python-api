@@ -5,12 +5,15 @@ GlobalVar = 'WE'
 
 OURheader = Headers()
 OURheader.add('access-control-allow-origin', '*')
-http200okresponse = Response(
-    response='',
-    headers=OURheader,
-    status=200,
-    mimetype='application/json'
-)
+
+def generate_http200ok(responseContent=''):
+    return Response(
+        response=responseContent,
+        headers=OURheader,
+        status=200,
+        mimetype='application/json'
+    )
+    
 
 def wraplist(values):
     vsJson = '['

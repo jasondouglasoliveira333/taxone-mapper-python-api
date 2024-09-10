@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, delete, insert, update
 
 from entity import *
-from util import *
+from util.util import *
 
 class ScheduleListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleListController')
@@ -32,8 +32,7 @@ class ScheduleListController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 schedulesJson = wrap(schedules)
             self.logger.debug('schedulesJson:' + schedulesJson)
-            http200okresponse.set_data(schedulesJson)
-            return http200okresponse
+            return generate_http200ok(schedulesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -119,12 +118,14 @@ class ScheduleObjectController(Resource):
 
         #remove old criterias
         if len(criteriasToRemove) > 0:
-            for creteriaId in criteriasToRemove:
-                criteriaDeleteQuery = delete(Criteria).where(Criteria.id == criteriaId)
-                session.execute(criteriaDeleteQuery)
+            criteriaDeleteQuery = delete(Criteria).where(Criteria.id.in_(criteriasToRemove))
+            session.execute(criteriaDeleteQuery)
+            #for criteriaId in criteriasToRemove:
+            #    criteriaDeleteQuery = delete(Criteria).where(Criteria.id == criteriaId)
+            #    session.execute(criteriaDeleteQuery)
                 
         session.commit()        
-        return http200okresponse
+        return generate_http200ok()
 
     def delete(self, id):
         self.logger.debug('in delete_schedule:' + str(id))
@@ -134,7 +135,7 @@ class ScheduleObjectController(Resource):
         session.commit()
         #q = Schedule.delete().where(Schedule.id==id)
         #q.execute()
-        return http200okresponse
+        return generate_http200ok()
 
 
     def get(self, id):
@@ -145,8 +146,7 @@ class ScheduleObjectController(Resource):
             schedules = session.scalars(schedulesStt).fetchall()
             schedule = schedules[0]
             schedulesJson = schedule.toJson()
-            http200okresponse.set_data(schedulesJson)
-            return http200okresponse
+            return generate_http200ok(schedulesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -164,8 +164,7 @@ class SchedulePeriodsController(Resource):
             schedule = schedules[0]
             #schedule = Schedule.get(int(id))
             schedulesJson = '{ "days" : "' + schedule.days + '", "hours": "' + schedule.hours + '" } '
-            http200okresponse.set_data(schedulesJson)
-            return http200okresponse
+            return generate_http200ok(schedulesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

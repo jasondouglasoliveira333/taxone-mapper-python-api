@@ -7,7 +7,7 @@ from flask_restful import Resource, Api
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 class EmailController(Resource):
     logger = logging.getLogger(__name__ + '.EmailController')
@@ -25,8 +25,7 @@ class EmailController(Resource):
             #response = json.loads(emailsJson)
             #self.logger.debug('>>response loaded', response)
             #return response
-            http200okresponse.set_data(emailsJson)
-            return http200okresponse
+            return generate_http200ok(emailsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -42,19 +41,14 @@ class EmailController(Resource):
                 Email.update(**email)
             else:
                 Email.create(**email)
-        return http200okresponse
+        return generate_http200ok()
 
 class EmailByIdController(Resource):
     logger = logging.getLogger(__name__ + '.EmailByIdController')
     
-    def get(self, id):
-        self.logger.debug('in list_emails with id:' + str(id))
-        return http200okresponse
-        
     def delete(self,id):
         self.logger.debug('in delete:' + str(id))
         q = Email.delete().where(Email.id==id)
         q.execute()
-        return http200okresponse
-
+        return generate_http200ok()
 

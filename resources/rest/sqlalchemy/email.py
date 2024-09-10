@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, delete
 
 from entity import *
-from util import *
+from util.util import *
 
 class EmailController(Resource):
     logger = logging.getLogger(__name__ + '.EmailController')
@@ -27,8 +27,7 @@ class EmailController(Resource):
             if (len(emails) > 0):
                 emailsJson = wrap(emails)
             self.logger.debug('emailsJson:' + emailsJson)
-            http200okresponse.set_data(emailsJson)
-            return http200okresponse
+            return generate_http200ok(emailsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -46,7 +45,6 @@ class EmailController(Resource):
                 session.add(email_to_insert)
                 
         session.commit()        
-        return http200okresponse
 
 class EmailByIdController(Resource):
     logger = logging.getLogger(__name__ + '.EmailByIdController')
@@ -57,6 +55,5 @@ class EmailByIdController(Resource):
         emailsStt = delete(Email).where(Email.id==id)
         session.execute(emailsStt)
         session.commit()
-        return http200okresponse
 
 

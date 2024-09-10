@@ -5,7 +5,7 @@ from flask import Response, request, jsonify
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 def list_emails():
     print('in list_emails')
@@ -17,8 +17,7 @@ def list_emails():
         if (len(emails) > 0):
             emailsJson = wrap(emails)
         print('emailsJson:', emailsJson)
-        http200okresponse.set_data(emailsJson)
-        return http200okresponse
+        return generate_http200ok(emailsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -35,12 +34,12 @@ def insert_update_email():
             Email.update(**email)
         else:
             Email.create(**email)
-    return http200okresponse
+    return generate_http200ok()
 
 def delete_email(id):
     print('in delete_email:', id)
     q = Email.delete().where(Email.id==id)
     q.execute()
     print('deleted')
-    return http200okresponse
+    return generate_http200ok()
 

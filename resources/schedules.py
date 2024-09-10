@@ -5,7 +5,7 @@ from flask import Response, request, jsonify
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 def list_shedules():
     print('in list_shedules')
@@ -16,8 +16,7 @@ def list_shedules():
         shedulesJson = '{"content": [], "totalPages": 0}'
         if (len(shedules) > 0):
             shedulesJson = wrap(shedules)
-        http200okresponse.set_data(shedulesJson)
-        return http200okresponse
+        return generate_http200ok(shedulesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -66,7 +65,7 @@ def insert_update_schedule():
             criteriaQuery = Criteria.insert(**criteria, schedule = scheduleEntity, safxColumn=safxColumn)
         criteriaQuery.execute()
         
-    return http200okresponse
+    return generate_http200ok()
 
 class TestAdd(object):
     pass
@@ -75,7 +74,7 @@ def delete_shedule(id):
     print('in delete_shedule:', id)
     q = Schedule.delete().where(Schedule.id==id)
     q.execute()
-    return http200okresponse
+    return generate_http200ok()
 
 
 def get_schedule(id):
@@ -83,8 +82,7 @@ def get_schedule(id):
     try: 
         schedule = Schedule.get(int(id))
         schedulesJson = schedule.toJson()
-        http200okresponse.set_data(schedulesJson)
-        return http200okresponse
+        return generate_http200ok(schedulesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -95,8 +93,7 @@ def get_schedule_periods(id):
     try: 
         schedule = Schedule.get(int(id))
         schedulesJson = '{ "days" : "' + schedule.days + '", "hours": "' + schedule.hours + '" } '
-        http200okresponse.set_data(schedulesJson)
-        return http200okresponse
+        return generate_http200ok(schedulesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []

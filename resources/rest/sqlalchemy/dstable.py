@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from entity import *
-from util import *
+from util.util import *
 
 class DSTableController(Resource):
     logger = logging.getLogger(__name__ + '.DSTableController')
@@ -26,8 +26,7 @@ class DSTableController(Resource):
             if (len(dstables) > 0):
                 dstablesJson = wraplist(dstables)
             self.logger.debug('dstablesJson:' + dstablesJson)
-            http200okresponse.set_data(dstablesJson)
-            return http200okresponse
+            return generate_http200ok(dstablesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -45,8 +44,7 @@ class DSColumnController(Resource):
             if (len(dsColumns) > 0):
                 dscolumnsJson = wrap(dsColumns)
             self.logger.debug('dscolumnsJson:' + dscolumnsJson)
-            http200okresponse.set_data(dscolumnsJson)
-            return http200okresponse
+            return generate_http200ok(dscolumnsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

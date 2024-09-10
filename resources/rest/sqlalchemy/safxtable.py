@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from entity import *
-from util import *
+from util.util import *
 
 class SAFXTableListController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableListController')
@@ -31,8 +31,7 @@ class SAFXTableListController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 safxtablesJson = wrap(safxtables, totalPages)
             self.logger.debug('safxtablesJson:' + safxtablesJson)
-            http200okresponse.set_data(safxtablesJson)
-            return http200okresponse
+            return generate_http200ok(safxtablesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -51,8 +50,7 @@ class SAFXTableColumnsController(Resource):
             if (len(safxcolumns) > 0):
                 safxcolumnsJson = wraplist(safxcolumns)
             self.logger.debug('safxcolumnsJson:' + safxcolumnsJson)
-            http200okresponse.set_data(safxcolumnsJson)
-            return http200okresponse
+            return generate_http200ok(safxcolumnsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -79,7 +77,7 @@ class SAFXTableColumnsController(Resource):
             session.add(safxColumnEntity)
             session.commit()
                 
-        return http200okresponse
+        return generate_http200ok()
 
 class SAFXTableObjectController(Resource):
     logger = logging.getLogger(__name__ + '.SAFXTableObjectController')
@@ -94,8 +92,7 @@ class SAFXTableObjectController(Resource):
             #safxtable = SAFXTable.get(id)
             safxtablesJson = safxtable.toJson()
             self.logger.debug('safxtablesJson:' + safxtablesJson)
-            http200okresponse.set_data(safxtablesJson)
-            return http200okresponse
+            return generate_http200ok(safxtablesJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -116,7 +113,7 @@ class SAFXTableObjectController(Resource):
             else:
                 #SAFXTable.create(**safxtable)
                 pass
-        return http200okresponse
+        return generate_http200ok()
 
 
 class SAFXTableDSTableController(Resource):
@@ -134,5 +131,5 @@ class SAFXTableDSTableController(Resource):
         self.logger.debug('safxTable.sql():')
         session.add(safxTable)
         session.commit()
-        return http200okresponse
+        return generate_http200ok()
 

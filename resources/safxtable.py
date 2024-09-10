@@ -5,7 +5,7 @@ from flask import Response, request, jsonify
 from werkzeug.datastructures import * #.Headers
 
 from entity import *
-from util import *
+from util.util import *
 
 def list_safxtables():
     print('in list_safxtables')
@@ -17,8 +17,7 @@ def list_safxtables():
         if (len(safxtables) > 0):
             safxtablesJson = wrap(safxtables)
         print('safxtablesJson:', safxtablesJson)
-        http200okresponse.set_data(safxtablesJson)
-        return http200okresponse
+        return generate_http200ok(safxtablesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -36,7 +35,7 @@ def update_safxtable():
             SAFXTable.update(**safxtable)
         else:
             SAFXTable.create(**safxtable)
-    return http200okresponse
+    return generate_http200ok()
 
 
 def list_safxcoluimns(id):
@@ -49,8 +48,7 @@ def list_safxcoluimns(id):
         if (len(safxcolumns) > 0):
             safxcolumnsJson = wraplist(safxcolumns)
         print('safxcolumnsJson:', safxcolumnsJson)
-        http200okresponse.set_data(safxcolumnsJson)
-        return http200okresponse
+        return generate_http200ok(safxcolumnsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -62,8 +60,7 @@ def get_safxtable(id):
         safxtable = SAFXTable.get(id)
         safxtablesJson = safxtable.toJson()
         print('safxtablesJson:', safxtablesJson)
-        http200okresponse.set_data(safxtablesJson)
-        return http200okresponse
+        return generate_http200ok(safxtablesJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -87,7 +84,7 @@ def update_safxcolumn(id):
         safxColumnEntity.dsColumn=dsColumn
         safxColumnEntity.save()
             
-    return http200okresponse
+    return generate_http200ok()
 
 def update_safxtable_dstable(id, dsTableId):
     print('in update_safxtable_dstable')
@@ -95,7 +92,7 @@ def update_safxtable_dstable(id, dsTableId):
     safxTable = SAFXTable.update(dsTable=dsTable).where(SAFXTable.id == id)
     print('safxTable.sql():', safxTable.sql())
     safxTable.execute()
-    return http200okresponse
+    return generate_http200ok()
 
 
 

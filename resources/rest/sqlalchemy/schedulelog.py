@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from entity import *
-from util import *
+from util.util import *
 
 class ScheduleLogListController(Resource):
     logger = logging.getLogger(__name__ + '.ScheduleLogListController')
@@ -34,8 +34,7 @@ class ScheduleLogListController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 schedulelogsJson = wrap(schedulelogs, totalPages)
             self.logger.debug('schedulelogsJson:' + schedulelogsJson)
-            http200okresponse.set_data(schedulelogsJson)
-            return http200okresponse
+            return generate_http200ok(schedulelogsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -67,8 +66,7 @@ class ScheduleLogStatisticsController(Resource):
             statistics.append({'status':'SENT', 'quantity': 0})
             statistics.append({'status':'PROCESSING_ERROR', 'quantity': 0})
             statisticsJson = json.dumps(statistics)
-            http200okresponse.set_data(statisticsJson)
-            return http200okresponse
+            return generate_http200ok(statisticsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -85,8 +83,7 @@ class ScheduleLogObjectController(Resource):
             scheduleLog = session.scalars(schedulelogsStt).one()
             scheduleLogsJson = scheduleLog.toJson()
             self.logger.debug('scheduleLogsJson:' + scheduleLogsJson)
-            http200okresponse.set_data(scheduleLogsJson)
-            return http200okresponse
+            return generate_http200ok(scheduleLogsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -105,8 +102,7 @@ class ScheduleLogTaxOneErrorController(Resource):
             if (len(scheduleLog.taxOneErrors) > 0):
                 taxOneErrorsJson = wrap(scheduleLog.taxOneErrors)
             self.logger.debug('taxOneErrorsJson:' + taxOneErrorsJson)
-            http200okresponse.set_data(taxOneErrorsJson)
-            return http200okresponse
+            return generate_http200ok(taxOneErrorsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

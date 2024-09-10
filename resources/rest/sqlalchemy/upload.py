@@ -7,7 +7,7 @@ from flask import Response, request
 from flask_restful import Resource, Api
 
 from entity import *
-from util import *
+from util.util import *
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -31,8 +31,7 @@ class UploadController(Resource):
                 totalPages = int(count / size) + 1 if count % size != 0 else 0
                 uploadsJson = wrap(uploads, totalPages)
             self.logger.debug('uploadsJson:' + uploadsJson)
-            http200okresponse.set_data(uploadsJson)
-            return http200okresponse
+            return generate_http200ok(uploadsJson)
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []
@@ -58,7 +57,7 @@ class UploadController(Resource):
             session.add(upload)
             session.commit()
             self.logger.debug('Saved')
-            return http200okresponse
+            return generate_http200ok()
         except:    
             self.logger.debug('sys.exception():' + repr(sys.exception()))
             return []

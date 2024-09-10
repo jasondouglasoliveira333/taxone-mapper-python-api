@@ -5,7 +5,7 @@ import json
 from flask import Response, request
 
 from entity import *
-from util import *
+from util.util import *
 
 def list_uploads():
     print('in list_uploads')
@@ -18,8 +18,7 @@ def list_uploads():
         if (len(uploads) > 0):
             uploadsJson = wrap(uploads)
         print('uploadsJson:', uploadsJson)
-        http200okresponse.set_data(uploadsJson)
-        return http200okresponse
+        return generate_http200ok(uploadsJson)
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
@@ -42,7 +41,6 @@ def insert_upload():
         upload.user = user
         upload.save()
         print('Saved')
-        return http200okresponse
     except:    
         print('sys.exception():', repr(sys.exception()))
         return []
