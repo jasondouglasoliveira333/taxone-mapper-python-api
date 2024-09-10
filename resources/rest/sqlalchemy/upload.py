@@ -8,6 +8,7 @@ from flask_restful import Resource, Api
 
 from entity import *
 from util.util import *
+from resources.integration.placeholder import *
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -16,6 +17,21 @@ class UploadController(Resource):
     logger = logging.getLogger(__name__ + '.UploadController')
     def get(self):
         self.logger.debug('in list_uploads')
+        """
+        ph = PlaceHolderClient()
+        print('will call ph.get_something()')
+        ph.get_something()
+        print('called ph.get_something()')
+        print('will call ph.delete_something()')
+        ph.delete_something()
+        print('called ph.delete_something()')
+        print('will call ph.post_something()')
+        ph.post_something()
+        print('called ph.post_something()')
+        print('will call ph.update_something()')
+        ph.update_something()
+        print('called ph.update_something()')
+        """
         session = Session(engine)
         try: 
             page = int(request.args.get('page'))
